@@ -1,3 +1,5 @@
+// Basically useless
+
 import Client from "./client.js"
 
 // var SuperScene = new Phaser.Class({

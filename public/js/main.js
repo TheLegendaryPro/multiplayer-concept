@@ -37,12 +37,15 @@
 //
 // export default Main
 
+// The main scene, supposed to load assets, maybe also starting scene?
 export default class Main extends Phaser.Scene {
     constructor() {
+        // Don't know why is needed? because phaser.scene needed a key?
         super("Main");
     }
 
     preload () {
+        // supposed to load everything here
         this.load.image('tiles', 'assets/images/dungeon_tiles.png');
         this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
 
@@ -53,10 +56,14 @@ export default class Main extends Phaser.Scene {
     };
 
     create () {
+        // When the user click the screen
         this.input.on('pointerup', function (pointer) {
 
+            // Start the scene
             var test = this.scene.start('Atrium');
             // console.log(test)
+
+            // Send test to server
             screen.client.sendTest();
 
         }, this);
