@@ -1,5 +1,7 @@
 import main from "./js/main.js"
 import atrium from "./js/atrium.js"
+import Client from "./js/client.js"
+// import SuperScene from "./js/superscene.js";
 
 var config = {
     type: Phaser.AUTO,
@@ -9,7 +11,8 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }
+            gravity: { y: 0 },
+            debug: true
         }
     },
     scene: [main, atrium]
@@ -18,5 +21,7 @@ var config = {
  // todo A scene or scenes to add to the game. If several are given, the first is started; the remainder are started only if they have { active: true }. See the sceneConfig argument in Phaser.Scenes.SceneManager#add.
 
 let game = new Phaser.Game(config)
-
+screen.client = new Client()
+// console.log(game.scene.scenes)
+// console.log(game.scene.getAt(0))
 

@@ -1,43 +1,63 @@
+// import Client from "./client.js"
+// import SuperScene from "./superscene.js";
 
 // let config = {
 //     active: true
 // }
+//
+// var Main = new Phaser.Class ({
+//
+//     Extends: SuperScene,
+//
+//     initialize:
+//
+//     function SceneB ()
+//     {
+//         Phaser.Scene.call(this, { key: 'sceneB' });
+//     },
+//
+//     preload () {
+//         this.load.image('tiles', 'assets/images/dungeon_tiles.png');
+//         this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
+//
+//         this.load.atlas('fauna', 'assets/images/fauna.png', 'assets/fauna.json');
+//
+//     },
+//
+//     create () {
+//         this.input.on('pointerup', function (pointer) {
+//
+//             var test = this.scene.start('Atrium');
+//             console.log(test)
+//             this.client.sendTest();
+//
+//         }, this);
+//     }
+// })
+//
+// export default Main
 
 export default class Main extends Phaser.Scene {
     constructor() {
-        super('Main');
+        super("Main");
     }
 
     preload () {
-        this.load.setBaseURL('http://labs.phaser.io');
+        this.load.image('tiles', 'assets/images/dungeon_tiles.png');
+        this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
 
-        this.load.image('sky', 'assets/skies/space3.png');
-        this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-        this.load.image('red', 'assets/particles/red.png');
+        this.load.atlas('fauna', 'assets/images/fauna.png', 'assets/fauna.json');
+
+        this.fauna = Phaser.Physics.Arcade.Sprite
+
     };
 
     create () {
-        this.add.image(400, 300, 'sky');
-
-        var particles = this.add.particles('red');
-
-        var emitter = particles.createEmitter({
-            speed: 100,
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD'
-        });
-
-        var logo = this.physics.add.image(400, 100, 'logo');
-
-        logo.setVelocity(500, 500);
-        logo.setBounce(1, 1);
-        logo.setCollideWorldBounds(true);
-
-        emitter.startFollow(logo);
-
         this.input.on('pointerup', function (pointer) {
 
-            this.scene.start('Atrium');
+            var test = this.scene.start('Atrium');
+            // console.log(test)
+            screen.client.sendTest();
 
         }, this);
     }
