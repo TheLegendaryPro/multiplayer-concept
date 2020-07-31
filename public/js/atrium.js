@@ -1,6 +1,7 @@
 // import {debugDraw} from "./debug.js";
 // import Client from "./client.js"
 // import SuperScene from "./superscene.js";
+// import Codec from "./codec.s"
 
 export default class Atrium extends Phaser.Scene {
 
@@ -93,6 +94,8 @@ export default class Atrium extends Phaser.Scene {
 
         // Start the updateCounter to 0 to make the client send something to the server every sometime
         this.updateCounter = 0
+        // Set a last coord for client to know if its location changed since update
+        this.lastCoord = {x: 0, y: 0}
 
         // Done everything else, now can ask for other players
         screen.client.askNewPlayer()
@@ -105,8 +108,10 @@ export default class Atrium extends Phaser.Scene {
 
     // Move players from client from server
     movePlayer (id, x, y) {
+        // console.log("movePlayer", id, x, y)
         // Find the player from player map
         var player = this.playerMap[id];
+        console.log(player)
         // console.log(player)
         // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
 
@@ -115,7 +120,7 @@ export default class Atrium extends Phaser.Scene {
             targets: player,
             x: x,
             y: y,
-            duration: 100 //todo
+            duration: 170 //todo
         }
 
         // Tween the player to the new place
@@ -140,9 +145,13 @@ export default class Atrium extends Phaser.Scene {
 
         // The stupid code that limites the data transfer rate
         if (this.updateCounter++ % 5 === 0) { //todo
-            // console.log("update position to server")
-            // Send the locaiton interger
-            screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
+            // Send the location integer only when there is change
+            if (this.lastCoord.x != Math.floor(this.fauna.x) || this.lastCoord.y != Math.floor(this.fauna.y)) {
+                screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
+                this.lastCoord.x = Math.floor(this.fauna.x)
+                this.lastCoord.y = Math.floor(this.fauna.y)
+                // console.log('update location')
+            }
         }
 
 

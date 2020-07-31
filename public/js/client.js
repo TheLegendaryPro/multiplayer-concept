@@ -1,3 +1,6 @@
+import Codec from "./codec.js"
+// let Codec = require('./public/js/codec.js').Codec
+
 export default class Client {
     // The class for client
     constructor() {
@@ -6,6 +9,9 @@ export default class Client {
         this.ready = false
         // Connect to socket.io
         this.socket = io.connect()
+
+        //todo remove it
+        this.recieveCount = 0
 
 
         // ALL event handlers, I have no idea where to put them
@@ -19,24 +25,32 @@ export default class Client {
             this.ready = true
 
         })
-        this.socket.on('otherlocation', (data) => {
+        this.socket.on('o', (buffer) => {
             // The constant update of location
             // Don't process until ready
+            // console.log("recieved", this.recieveCount++)
             if (!this.ready) return
+            // if (!data) return
+
             // console.log("otherlocation", data)
             // console.log(data[0].id)
+            // console.log(buffer)
+            var data = Codec.decodePlayerChunk(buffer)
+            // console.log(data)
 
             // Filter away self
-            let filterResult = data.filter(playerData => playerData.id != this.scene.fauna.id)
+            // console.log(this.scene.fauna.id)
+            let filterResult = data.filter(playerData => playerData.playerID != this.scene.fauna.id)
             // console.log('filtered', filterResult)
 
             // Call the move function them move them
-            filterResult.forEach(player => this.scene.movePlayer(player.id, player.x, player.y))
+            filterResult.forEach(player => this.scene.movePlayer(player.playerID, player.x, player.y))
+            // console.log("processed")
         })
 
         // The function to add a new player
         this.socket.on('newplayer', (data) => {
-            this.scene.addNewPlayer(data.id, data.x, data.y)
+            this.scene.addNewPlayer(data.playerID, data.x, data.y)
         })
 
         // The function to know what is my id from the server
@@ -62,7 +76,16 @@ export default class Client {
 
     // The fuction that is called constantly
     sendLocation(x, y) {
-        this.socket.emit('update', {x: x, y: y})
+        if (!this.ready) return
+        var update = {
+            playerID: this.scene.fauna.id,
+            x: x,
+            y: y
+        }
+
+        var buffer = Codec.encode(update, Codec.updateSchema)
+
+        this.socket.emit('u', buffer)
     }
 
     // Ask for the new players
