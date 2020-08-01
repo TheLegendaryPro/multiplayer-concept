@@ -19,7 +19,7 @@ export default class Client {
             // Add players from the allplayer call from server
             console.log('allplayer', data)
             for(var i = 0; i < data.length; i++){
-                this.scene.addNewPlayer(data[i].id,data[i].x,data[i].y);
+                this.scene.addNewPlayer(data[i].playerID,data[i].x,data[i].y);
             }
             // Now that things are loaded, we are ready
             this.ready = true
@@ -50,6 +50,7 @@ export default class Client {
 
         // The function to add a new player
         this.socket.on('newplayer', (data) => {
+            console.log('newplayer', data)
             this.scene.addNewPlayer(data.playerID, data.x, data.y)
         })
 
@@ -63,6 +64,7 @@ export default class Client {
 
         // Remove players
         this.socket.on('remove', playerID => {
+            console.log(playerID)
             this.scene.removePlayer(playerID)
             console.log('remove', playerID)
         })
@@ -76,15 +78,20 @@ export default class Client {
 
     // The fuction that is called constantly
     sendLocation(x, y) {
+        // Do not send location until the scene is loaded
         if (!this.ready) return
+        // What is contained inside the package
         var update = {
-            playerID: this.scene.fauna.id,
+            // playerID: this.scene.fauna.id,
             x: x,
             y: y
         }
 
+        // Encode the message using the updateSchema
         var buffer = Codec.encode(update, Codec.updateSchema)
 
+        // UpdateLocation
+        // Send the update package with the buffer
         this.socket.emit('u', buffer)
     }
 

@@ -111,7 +111,7 @@ export default class Atrium extends Phaser.Scene {
         // console.log("movePlayer", id, x, y)
         // Find the player from player map
         var player = this.playerMap[id];
-        console.log(player)
+        // console.log(player)
         // console.log(player)
         // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
 

@@ -20,8 +20,8 @@ Codec.updateSchema = {
 
 Codec.encode = function(message,schema){
     var size = Codec.computeSize(message,schema); // Count how many bytes should be allocated in the buffer
-    var buffer = new ArrayBuffer(size);
-    Codec.encodeBuffer(message,buffer,schema);
+    var buffer = new ArrayBuffer(size); // Create a new array buffer
+    Codec.encodeBuffer(message,buffer,schema); // Actually encode the buffer
     return buffer;
 };
 
@@ -60,15 +60,17 @@ Codec.encodeBuffer = function(message,buffer,schema){
 
     if(schema.numerical) {
         Object.keys(schema.numerical).forEach(function (key) {
-            if(message[key] !== undefined){ // If the message contains that propertie, encode it
+            if(message[key] !== undefined){ // If the message contains that properties, encode it
                 offset = Codec.encodeBytes(dv,offset,schema.numerical[key],message[key]);
                 bitmask |= 1; // Bitwise operation to indicate in the mask that the current property is present in the message
+                // which is turning 0000 to 0001, or 1110 to 1111, or 1001 to 1001
             }
             bitmask <<= 1; // Shift the bitmask to the next property
+            // which is turning 0001 to 0010, or 0101 to 1010, or 1111 to 1110
         });
     }
 
-    if(schema.strings) {
+    if(schema.strings.length) { // If it is a array, it should be if array.length, or else it doesn't work
         schema.strings.forEach(function (key) {
             if(message[key] !== undefined){
                 var length = message[key].length;
@@ -81,7 +83,7 @@ Codec.encodeBuffer = function(message,buffer,schema){
         });
     }
 
-    if(schema.booleans.length){
+    if(schema.booleans.length){ // If it is a array, it should be if array.length, or else it doesn't work
         var booleans = 0; // Create a bitmask to store the values of each boolean, one per bit
         schema.booleans.forEach(function (key) {
             if(message[key] !== undefined) {
@@ -153,9 +155,9 @@ Codec.encodeChunkBuffer = function(playersArray,buffer,schema) {
 
 Codec.decode = function(buffer,schema){
 
-    var dv = new DataView(buffer);
-    var offset = 0;
-    var message = {};
+    var dv = new DataView(buffer); // Create a dataview to interact with the buffer
+    var offset = 0; // The place to look for data
+    var message = {}; // The object we are trying to read
 
     var nbProperties = Codec.countProperties(schema); // Determine how many properties are listed in the schema
     // schema.propertiesBytes indicates how many bytes are required to make a mask for all the possible properties of the schema
@@ -175,7 +177,7 @@ Codec.decode = function(buffer,schema){
         });
     }
 
-    if(schema.strings) {
+    if(schema.strings.length) { // Only read strings if they are in the schema
         schema.strings.forEach(function (key) {
             if(Codec.isMaskTrue(bitmask,nbProperties,idx)) {
                 // Same process as for the numerical fields, but need to decode one additional byte to know the length of each string
@@ -188,7 +190,7 @@ Codec.decode = function(buffer,schema){
         });
     }
 
-    if(schema.booleans.length){
+    if(schema.booleans.length){ // Only read bool if they are in schema
         var booleans = dv['getUint'+(schema.booleanBytes*8)](offset); // just like propertiesMask, bools is a mask indicating the presence/absence of each boolean
         var boolidx = 1; // index of the next boolean to decode
         offset += schema.booleanBytes;

@@ -86,12 +86,16 @@ io.on('connection', function (socket) {
         // Join the main room
         socket.join('main')
 
+        // UpdateLocation
         // Clients keep sending this, which is their location
         socket.on('u', function (data) {
             // Set the value for the player object
             // console.log('update', data.x, data.y)
+            // Turn it from node buffer to js array buffer
             var arrayBufferData = Codec.toArrayBuffer(data)
+            // Decode the buffer
             var content = Codec.decode(arrayBufferData, Codec.updateSchema)
+            // Now that it is decoded, we can get the x and y
             socket.player.x = content.x
             socket.player.y = content.y
             // todo not loop throught sockets, but maybe make another object with only id, x and y, like player map
