@@ -15,7 +15,7 @@ export default class Client {
 
 
         // ALL event handlers, I have no idea where to put them
-        this.socket.on('allplayers', (data) => {
+        this.socket.on('a', (data) => {
             // Add players from the allplayer call from server
             console.log('allplayer', data)
             for(var i = 0; i < data.length; i++){
@@ -49,21 +49,21 @@ export default class Client {
         })
 
         // The function to add a new player
-        this.socket.on('newplayer', (data) => {
-            console.log('newplayer', data)
+        this.socket.on('j', (data) => {
+            console.log('player join', data)
             this.scene.addNewPlayer(data.playerID, data.x, data.y)
         })
 
         // The function to know what is my id from the server
         // Stupid way, but works
-        this.socket.on('yourid', (id) => {
+        this.socket.on('i', (id) => {
             console.log('yourid')
             this.scene.fauna.id = id
             console.log(this.scene.fauna.id)
         })
 
         // Remove players
-        this.socket.on('remove', playerID => {
+        this.socket.on('r', playerID => {
             console.log(playerID)
             this.scene.removePlayer(playerID)
             console.log('remove', playerID)
@@ -73,7 +73,9 @@ export default class Client {
     // A function to send test, then the server will recieve and log it
     sendTest () {
         console.log("test sent")
-        this.socket.emit('test')
+        this.socket.emit('test', 'content', function (answer) {
+            console.log(answer)
+        })
     };
 
     // The fuction that is called constantly
@@ -97,7 +99,7 @@ export default class Client {
 
     // Ask for the new players
     askNewPlayer () {
-        this.socket.emit('newplayer')
+        this.socket.emit('n')
     }
 
     // Needed to access the scene, couldn't think of a better way
@@ -105,6 +107,15 @@ export default class Client {
         this.scene = game.scene.getScene('Atrium')
     }
 
+    changeMap (newMap, oldMap) {
+        this.ready = false
+        this.socket.emit('c', newMap, oldMap, (ark) => {
+            this.ready = true
+            console.log(this.ready)
+            this.scene.removeAllPlayers()
+            this.socket.emit('cg', ark, Math.floor(this.scene.fauna.x), Math.floor(this.scene.fauna.y))
+        })
+    }
 }
 
 // clientVar.socket.on('allplayers',function(data) {

@@ -1,13 +1,4 @@
-// import {debugDraw} from "./debug.js";
-// import Client from "./client.js"
-// import SuperScene from "./superscene.js";
-// import Codec from "./codec.s"
-
 export default class Atrium extends Phaser.Scene {
-
-    // Only work in typescript?
-    // private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
-    // pirvate fauna!: Phaser.Physics.Arcade.Sprite
 
     constructor() {
         super("Atrium")
@@ -15,82 +6,90 @@ export default class Atrium extends Phaser.Scene {
 
     preload ()
     {
-        // Controls must be added insde here
+        // Add the Sprite for player here
+        this.fauna = Phaser.Physics.Arcade.Sprite
+        // Controls must be added inside here
         this.cursors = this.input.keyboard.createCursorKeys()
-
-        // this.fauna = Phaser.Physics.Arcade.Sprite
-        // console.log(this.game.scene.getScene('Atrium'))
 
         // Make it so that client can reference here, stupid code but works
         screen.client.setGameScene(this.game)
+
+        this.portalJSON = this.returnPortalJSON()
     }
 
     create ()
     {
-        // Make the map
-        const map = this.make.tilemap({ key: 'dungeon'});
-        const tileset = map.addTilesetImage('dungeon', 'tiles');
-
-        // Load the map layer
-        map.createStaticLayer('ground', tileset);
-        const wallLayer = map.createStaticLayer('wall', tileset);
-
-        // So that user collides to the wall
-        wallLayer.setCollisionByProperty({collide: true});
-
+        // ## PLAYER ##
         // The sprite
-        this.fauna = this.physics.add.sprite(128, 128, 'fauna', 'walk-down-3.png');
+        this.fauna = this.physics.add.sprite(600, 1200, 'fauna', 'walk-down-3.png')
         this.fauna.body.setSize(this.fauna.width * 0.5, this.fauna.height * 0.8)
+        // Add the animation
+        this.createPlayerAnimations()
 
-        //todo A bunch of animation, make them into another function
-        this.anims.create({
-            key: 'fauna-idle-down',
-            frames: [{ key: 'fauna', frame: 'walk-down-3.png'}]
-        })
+        this.currentMap = this.loadMap('atriumSample1', 'atriumSampleTiles')
 
-        this.anims.create({
-            key: 'fauna-idle-up',
-            frames: [{ key: 'fauna', frame: 'walk-up-3.png'}]
-        })
 
-        this.anims.create({
-            key: 'fauna-idle-side',
-            frames: [{ key: 'fauna', frame: 'walk-side-3.png'}]
-        })
+        // // ## LOAD MAP ##
+        // // Create the tilemap
+        // const map = this.make.tilemap({key: 'atriumSample1'})
+        // // Add image to it
+        // const tileset = map.addTilesetImage('atriumSample1', 'atriumSampleTiles')
+        // // Create the normal static layers
+        // map.createStaticLayer('ground', tileset)
+        // map.createStaticLayer('darktiles', tileset)
+        // map.createStaticLayer('escalator', tileset)
+        // // Add colliding layers
+        // map.layers.forEach(item => console.log(item))
+        // console.log(map.layers)
+        // const barrierLayer = map.createStaticLayer('barrier', tileset)
+        // const railLayer = map.createStaticLayer('rail', tileset)
+        // const treesLayer = map.createStaticLayer('trees', tileset)
+        // const itemsLayer = map.createStaticLayer('items', tileset)
+        // const collidingObjects = [barrierLayer, railLayer, treesLayer, itemsLayer]
 
-        this.anims.create({
-            key: 'fauna-run-down',
-            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-down-', suffix: '.png'}),
-            repeat: -1,
-            frameRate: 10
-        })
+        // // Make the map
+        // const map = this.make.tilemap({ key: 'dungeon'});
+        // const tileset = map.addTilesetImage('dungeon', 'tiles');
+        //
+        // // Load the map layer
+        // map.createStaticLayer('ground', tileset);
+        // const wallLayer = map.createStaticLayer('wall', tileset);
+        //
+        // // So that user collides to the wall
+        // wallLayer.setCollisionByProperty({collide: true});
+        // ## ADD OBJECTS ##
+        // this.portalVert = this.physics.add.image(400, 500, 'portalVert').setImmovable()
+        // this.portalVert.setScale(5, 5)
+        // add the portal object
 
-        this.anims.create({
-            key: 'fauna-run-up',
-            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-up-', suffix: '.png'}),
-            repeat: -1,
-            frameRate: 10
-        })
 
-        this.anims.create({
-            key: 'fauna-run-side',
-            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-side-', suffix: '.png'}),
-            repeat: -1,
-            frameRate: 10
-        })
+
+
+
 
         // Start playing the animations
         this.fauna.anims.play('fauna-idle-up')
 
-        // Set collider so that wall and player collides
-        this.physics.add.collider(this.fauna, wallLayer)
+
+
+        // ## COLLIDERS ##
+        // collidingObjects.forEach(object => {
+        //     object.setCollisionByProperty({collide: true});
+        //     this.physics.add.collider(this.fauna, object)
+        // } )
+        // // Set collider so that wall and player collides
+        // this.physics.add.collider(this.fauna, wallLayer)
+
+        // this.physics.add.collider(this.fauna, this.portalVert)
+
+
+
 
         // Make the camera follow the player
         this.cameras.main.startFollow(this.fauna, true)
 
         // The map have no players yet
         this.playerMap = {}
-        // Client.askNewPlayer()
 
         // Start the updateCounter to 0 to make the client send something to the server every sometime
         this.updateCounter = 0
@@ -99,6 +98,110 @@ export default class Atrium extends Phaser.Scene {
 
         // Done everything else, now can ask for other players
         screen.client.askNewPlayer()
+
+        this.fauna.setDepth(1)
+        // map.removeAllLayers()
+    }
+
+
+    loadMap (mapName, tileName) {
+        const map = this.make.tilemap({key: mapName})
+        const tileset = map.addTilesetImage(mapName, tileName)
+        map.colliders = []
+        map.layers.forEach(layer => {
+            // console.log(layer.name)
+            var tempLayer = map.createStaticLayer(layer.name, tileset)
+            tempLayer.setCollisionByProperty({collide: true})
+            var tempCollider = this.physics.add.collider(this.fauna, tempLayer)
+            map.colliders.push(tempCollider)
+        })
+        this.addAllPortals(this.portalJSON, mapName)
+        return map
+    }
+
+
+
+    addAllPortals (result, mapName) {
+        console.log('result', result)
+        console.log('mapName', mapName)
+        this.portalArray = []
+        result[mapName].forEach(portal => {
+            var tempPortal = this.addPortal(portal.x, portal.y, portal.map, portal.tileset, portal.vert, portal.tpX, portal.tpY, mapName)
+            this.portalArray.push(tempPortal)
+        })
+
+    }
+
+    addPortal (x, y, map, tileset, vert, tpX, tpY, mapName) {
+        console.log(x, y, map, tileset, vert, tpX, tpY)
+        if (vert) {
+            var portal = this.physics.add.image(x, y, 'portalVert').setImmovable()
+        } else {
+            var portal = this.physics.add.image(x, y, 'portalHorz').setImmovable()
+        }
+        var collider = this.physics.add.collider(this.fauna, portal, this.hitPortal, null, this)
+        portal.setScale(5, 5)
+        portal.oldMap = mapName
+        portal.targetMap = map
+        portal.targetTileset = tileset
+        portal.tpX = tpX
+        portal.tpY = tpY
+        portal.collider = collider
+        return portal
+    }
+
+
+    createPlayerAnimations () {
+        this.anims.create({
+            key: 'fauna-idle-down',
+            frames: [{ key: 'fauna', frame: 'walk-down-3.png'}]
+        })
+        this.anims.create({
+            key: 'fauna-idle-up',
+            frames: [{ key: 'fauna', frame: 'walk-up-3.png'}]
+        })
+        this.anims.create({
+            key: 'fauna-idle-side',
+            frames: [{ key: 'fauna', frame: 'walk-side-3.png'}]
+        })
+        this.anims.create({
+            key: 'fauna-run-down',
+            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-down-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'fauna-run-up',
+            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-up-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'fauna-run-side',
+            frames: this.anims.generateFrameNames('fauna', { start: 1, end: 8, prefix: 'run-side-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
+    }
+
+    hitPortal (fauna, portal) {
+        console.log('portal', portal)
+
+        this.currentMap.colliders.forEach(collider => collider.destroy())
+        this.portalArray.forEach(portal => portal.collider.destroy())
+        // // this.testCollider.destroy()
+        // // portalHorz.disableBody(true, true);
+        var oldMap = portal.oldMap
+        var map = portal.targetMap
+        var tileset = portal.targetTileset
+        var x = portal.tpX
+        var y = portal.tpY
+        portal.destroy()
+        this.currentMap.destroy()
+        this.currentMap = this.loadMap(map, tileset)
+        this.fauna.setPosition(x, y)
+        screen.client.changeMap(map, oldMap)
+
     }
 
     // Add new players from the object from server
@@ -110,7 +213,8 @@ export default class Atrium extends Phaser.Scene {
     movePlayer (id, x, y) {
         // console.log("movePlayer", id, x, y)
         // Find the player from player map
-        var player = this.playerMap[id];
+        var player = this.playerMap[id]
+        if (player == undefined) return
         // console.log(player)
         // console.log(player)
         // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
@@ -134,6 +238,13 @@ export default class Atrium extends Phaser.Scene {
     removePlayer (id) {
         this.playerMap[id].destroy();
         delete this.playerMap[id];
+    }
+
+    removeAllPlayers () {
+        for (var key in this.playerMap) {
+            this.removePlayer(key)
+        }
+        console.log("removed all players")
     }
 
     update()
@@ -183,5 +294,32 @@ export default class Atrium extends Phaser.Scene {
             this.fauna.setVelocity(0, 0)
         }
 
+    }
+
+    returnPortalJSON () {
+        return{
+            "atriumSample1": [
+                {
+                    "x": 700,
+                    "y": 1050,
+                    "map": "dungeon",
+                    "tileset": "tiles",
+                    "vert": false,
+                    "tpX": 100,
+                    "tpY": 100
+                }
+            ],
+            "dungeon": [
+                {
+                    "x": 50,
+                    "y": 50,
+                    "map": "atriumSample1",
+                    "tileset": "atriumSampleTiles",
+                    "vert": true,
+                    "tpX": 600,
+                    "tpY": 1100
+                }
+            ]
+        }
     }
 }
