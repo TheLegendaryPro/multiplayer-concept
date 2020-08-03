@@ -20,7 +20,7 @@ var config = {
 
 
 // Call the game
-let game = new Phaser.Game(config)
+screen.game = new Phaser.Game(config)
 // Set the socket.io client and bound it to screen
 screen.client = new Client()
 

@@ -1,3 +1,5 @@
+
+
 export default class Atrium extends Phaser.Scene {
 
     constructor() {
@@ -15,76 +17,33 @@ export default class Atrium extends Phaser.Scene {
         screen.client.setGameScene(this.game)
 
         this.portalJSON = this.returnPortalJSON()
+        this.offsetJSON = this.returnOffsetJSON()
     }
 
     create ()
     {
+        // Texture
+        // this.currentTexture = new Phaser.Textures.Texture()
         // ## PLAYER ##
         // The sprite
-        this.fauna = this.physics.add.sprite(600, 1200, 'fauna', 'walk-down-3.png')
-        this.fauna.body.setSize(this.fauna.width * 0.5, this.fauna.height * 0.8)
+        this.fauna = this.physics.add.sprite(600, 1200, 'fauna')
+        this.fauna.body.setSize(15, 25, true)
+        console.log('offset', this.fauna.body.offset.x)
         // Add the animation
         this.createPlayerAnimations()
+
+        // console.log(this.fauna.texture.manager)
+        // this.fauna.texture.manager.setTexture(this.fauna, 'fauna')
+
+        this.setSkin("boy")
 
         // Load the map then set it as the current map for the ease of unloading it
         this.currentMap = this.loadMap('atriumSample1', 'atriumSampleTiles')
 
-
-        // // ## LOAD MAP ##
-        // // Create the tilemap
-        // const map = this.make.tilemap({key: 'atriumSample1'})
-        // // Add image to it
-        // const tileset = map.addTilesetImage('atriumSample1', 'atriumSampleTiles')
-        // // Create the normal static layers
-        // map.createStaticLayer('ground', tileset)
-        // map.createStaticLayer('darktiles', tileset)
-        // map.createStaticLayer('escalator', tileset)
-        // // Add colliding layers
-        // map.layers.forEach(item => console.log(item))
-        // console.log(map.layers)
-        // const barrierLayer = map.createStaticLayer('barrier', tileset)
-        // const railLayer = map.createStaticLayer('rail', tileset)
-        // const treesLayer = map.createStaticLayer('trees', tileset)
-        // const itemsLayer = map.createStaticLayer('items', tileset)
-        // const collidingObjects = [barrierLayer, railLayer, treesLayer, itemsLayer]
-
-        // // Make the map
-        // const map = this.make.tilemap({ key: 'dungeon'});
-        // const tileset = map.addTilesetImage('dungeon', 'tiles');
-        //
-        // // Load the map layer
-        // map.createStaticLayer('ground', tileset);
-        // const wallLayer = map.createStaticLayer('wall', tileset);
-        //
-        // // So that user collides to the wall
-        // wallLayer.setCollisionByProperty({collide: true});
-        // ## ADD OBJECTS ##
-        // this.portalVert = this.physics.add.image(400, 500, 'portalVert').setImmovable()
-        // this.portalVert.setScale(5, 5)
-        // add the portal object
-
-
-
-
-
-
         // Start playing the animations
-        this.fauna.anims.play('fauna-idle-up')
+        this.fauna.anims.play('boy-idle-up')
 
-
-
-        // ## COLLIDERS ##
-        // collidingObjects.forEach(object => {
-        //     object.setCollisionByProperty({collide: true});
-        //     this.physics.add.collider(this.fauna, object)
-        // } )
-        // // Set collider so that wall and player collides
-        // this.physics.add.collider(this.fauna, wallLayer)
-
-        // this.physics.add.collider(this.fauna, this.portalVert)
-
-
-
+        // this.fauna.setTexture('boy')
 
         // Make the camera follow the player
         this.cameras.main.startFollow(this.fauna, true)
@@ -101,7 +60,68 @@ export default class Atrium extends Phaser.Scene {
         screen.client.askNewPlayer()
 
         this.fauna.setDepth(1)
-        // map.removeAllLayers()
+    }
+
+    update() {
+        // If no curser or no fauna, we don't update
+        if (!this.cursors || !this.fauna) {
+            return
+        }
+
+        // The stupid code that limites the data transfer rate
+        if (this.updateCounter++ % 10 === 0) { //todo
+            // Send the location integer only when there is change
+            if (this.lastCoord.x != Math.floor(this.fauna.x) || this.lastCoord.y != Math.floor(this.fauna.y)) {
+                screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
+                this.lastCoord.x = Math.floor(this.fauna.x)
+                this.lastCoord.y = Math.floor(this.fauna.y)
+                // console.log('update location')
+            }
+        }
+
+
+        // The code to make moveing work
+        const speed = 100
+
+        // this.fauna.setTexture('boy')
+        const parts = this.fauna.anims.currentAnim.key.split('-')
+        parts[0] = this.skin
+
+        if (this.cursors.left?.isDown) {
+            parts[1] = "run"
+            parts[2] = "side"
+            this.fauna.setVelocity(-speed, 0)
+            this.fauna.scaleX = -1
+            this.fauna.body.offset.x = this.leftOffset
+        } else if (this.cursors.right?.isDown) {
+            parts[1] = "run"
+            parts[2] = "side"
+            this.fauna.setVelocity(speed, 0)
+            this.fauna.scaleX = 1
+            this.fauna.body.offset.x = this.rightOffset
+        } else if (this.cursors.up?.isDown) {
+            parts[1] = "run"
+            parts[2] = "up"
+            this.fauna.setVelocity(0, -speed)
+        } else if (this.cursors.down?.isDown) {
+            parts[1] = "run"
+            parts[2] = "down"
+            this.fauna.setVelocity(0, speed)
+        } else {
+            parts[1] = 'idle'
+            this.fauna.setVelocity(0, 0)
+        }
+        // console.log(parts.join('-'))
+        this.fauna.anims.play(parts.join('-'), true)
+
+    }
+
+
+    setSkin (skinName) {
+        this.skin = skinName
+        this.leftOffset = this.offsetJSON[skinName].leftOffset
+        this.rightOffset = this.offsetJSON[skinName].rightOffset
+        this.fauna.body.offset.x = this.rightOffset
     }
 
 
@@ -163,6 +183,113 @@ export default class Atrium extends Phaser.Scene {
     }
 
 
+    hitPortal (fauna, portal) {
+        // Delete all colliders from the map layers
+        this.currentMap.colliders.forEach(collider => collider.destroy())
+        // Delete all colliders from the portal
+        this.portalArray.forEach(portal => portal.collider.destroy())
+        // Fetch the data from the portal before it is destroyed
+        var oldMap = portal.oldMap
+        var map = portal.targetMap
+        var tileset = portal.targetTileset
+        var x = portal.tpX
+        var y = portal.tpY
+        // Now that data is fetched, we can destroy all portals
+        this.portalArray.forEach( tempPortal => tempPortal.destroy())
+        // Destroy the map too
+        this.currentMap.destroy()
+        // Then load the new map
+        this.currentMap = this.loadMap(map, tileset)
+        // Teleport the player to the correct position
+        this.fauna.setPosition(x, y)
+        // Ask the client to emit change map
+        screen.client.changeMap(map, oldMap)
+
+    }
+
+    // Add new players from the object from server
+    addNewPlayer (id, x, y) {
+        this.playerMap[id] = this.add.sprite(x, y, 'fauna', 'walk-down-3.png')
+    }
+
+
+
+    endTween (arg) {
+        // let parts = ["fauna", "idle"]
+        // parts[2] = arg.targets[0].tweenDirection
+        // arg.targets[0].anims.play(parts.join("-"), true)
+        arg.targets[0].anims.pause()
+    }
+
+    // Move players from client from server
+    movePlayer (id, x, y) {
+        // console.log("movePlayer", id, x, y)
+        // Find the player from player map
+        var player = this.playerMap[id]
+        if (player == undefined) return
+        // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
+
+
+        let tempDirection = player.tweenDirection
+
+        if (Math.abs(player.x - x) > Math.abs(player.y - y)) {
+            if (player.x > x) {
+                player.tweenDirection = "side"
+                player.scaleX = -1
+            } else {
+                player.tweenDirection = "side"
+                player.scaleX = 1
+            }
+        } else {
+            if (player.y > y) {
+                player.tweenDirection = "up"
+            } else {
+                player.tweenDirection = "down"
+            }
+        }
+        if (tempDirection == player.tweenDirection) {
+            console.log('true')
+            player.anims.resume()
+        } else {
+            let parts = ["fauna", "run"]
+            parts[2] = player.tweenDirection
+            player.anims.play(parts.join("-"), true)
+        }
+
+
+
+        // Set up the config for tween
+        var config = {
+            targets: player,
+            x: x,
+            y: y,
+            duration: 250, //todo
+            // onStart: this.startTween,
+            onComplete: this.endTween
+        }
+
+        // Tween the player to the new place
+        var tween = this.tweens.add(config)
+        // var tween = this.add.tween(config).to({x:x,y:y})
+        // var duration = 0.2//distance*10;
+        // tween.start();
+    }
+
+    // Remove players when server tell us to
+    removePlayer (id) {
+        this.playerMap[id].destroy();
+        delete this.playerMap[id];
+    }
+
+    removeAllPlayers () {
+        // Loop through the player map and remove them all
+        for (var key in this.playerMap) {
+            this.removePlayer(key)
+        }
+    }
+
+
+
     createPlayerAnimations () {
         this.anims.create({
             key: 'fauna-idle-down',
@@ -194,123 +321,38 @@ export default class Atrium extends Phaser.Scene {
             repeat: -1,
             frameRate: 10
         })
+        this.anims.create({
+            key: 'boy-idle-down',
+            frames: [{ key: 'boy', frame: 'walk-down-3.png'}]
+        })
+        this.anims.create({
+            key: 'boy-idle-up',
+            frames: [{ key: 'boy', frame: 'walk-up-3.png'}]
+        })
+        this.anims.create({
+            key: 'boy-idle-side',
+            frames: [{ key: 'boy', frame: 'walk-side-3.png'}]
+        })
+        this.anims.create({
+            key: 'boy-run-down',
+            frames: this.anims.generateFrameNames('boy', { start: 1, end: 4, prefix: 'walk-down-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'boy-run-up',
+            frames: this.anims.generateFrameNames('boy', { start: 1, end: 4, prefix: 'walk-up-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
+        this.anims.create({
+            key: 'boy-run-side',
+            frames: this.anims.generateFrameNames('boy', { start: 1, end: 4, prefix: 'walk-side-', suffix: '.png'}),
+            repeat: -1,
+            frameRate: 10
+        })
     }
 
-    hitPortal (fauna, portal) {
-        // Delete all colliders from the map layers
-        this.currentMap.colliders.forEach(collider => collider.destroy())
-        // Delete all colliders from the portal
-        this.portalArray.forEach(portal => portal.collider.destroy())
-        // Fetch the data from the portal before it is destroyed
-        var oldMap = portal.oldMap
-        var map = portal.targetMap
-        var tileset = portal.targetTileset
-        var x = portal.tpX
-        var y = portal.tpY
-        // Now that data is fetched, we can destroy all portals
-        this.portalArray.forEach( tempPortal => tempPortal.destroy())
-        // Destroy the map too
-        this.currentMap.destroy()
-        // Then load the new map
-        this.currentMap = this.loadMap(map, tileset)
-        // Teleport the player to the correct position
-        this.fauna.setPosition(x, y)
-        // Ask the client to emit change map
-        screen.client.changeMap(map, oldMap)
-
-    }
-
-    // Add new players from the object from server
-    addNewPlayer (id, x, y) {
-        this.playerMap[id] = this.add.sprite(x, y, 'fauna', 'walk-down-3.png')
-    }
-
-    // Move players from client from server
-    movePlayer (id, x, y) {
-        // console.log("movePlayer", id, x, y)
-        // Find the player from player map
-        var player = this.playerMap[id]
-        if (player == undefined) return
-        // console.log(player)
-        // console.log(player)
-        // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
-
-        // Set up the config for tween
-        var config = {
-            targets: player,
-            x: x,
-            y: y,
-            duration: 170 //todo
-        }
-
-        // Tween the player to the new place
-        var tween = this.tweens.add(config)
-        // var tween = this.add.tween(config).to({x:x,y:y})
-        // var duration = 0.2//distance*10;
-        // tween.start();
-    }
-
-    // Remove players when server tell us to
-    removePlayer (id) {
-        this.playerMap[id].destroy();
-        delete this.playerMap[id];
-    }
-
-    removeAllPlayers () {
-        // Loop through the player map and remove them all
-        for (var key in this.playerMap) {
-            this.removePlayer(key)
-        }
-    }
-
-    update()
-    {
-        // If no curser or no fauna, we don't update
-        if (!this.cursors || !this.fauna) {
-            return
-        }
-
-        // The stupid code that limites the data transfer rate
-        if (this.updateCounter++ % 5 === 0) { //todo
-            // Send the location integer only when there is change
-            if (this.lastCoord.x != Math.floor(this.fauna.x) || this.lastCoord.y != Math.floor(this.fauna.y)) {
-                screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
-                this.lastCoord.x = Math.floor(this.fauna.x)
-                this.lastCoord.y = Math.floor(this.fauna.y)
-                // console.log('update location')
-            }
-        }
-
-
-        // The code to make moveing work
-        const speed = 100
-
-        if (this.cursors.left?.isDown) {
-            this.fauna.anims.play('fauna-run-side', true)
-            this.fauna.setVelocity(-speed, 0)
-
-            this.fauna.scaleX = -1
-            this.fauna.body.offset.x = 24
-        } else if (this.cursors.right?.isDown) {
-            this.fauna.anims.play('fauna-run-side', true)
-            this.fauna.setVelocity(speed, 0)
-
-            this.fauna.scaleX = 1
-            this.fauna.body.offset.x = 8
-        } else if (this.cursors.up?.isDown) {
-            this.fauna.anims.play('fauna-run-up', true)
-            this.fauna.setVelocity(0, -speed)
-        } else if (this.cursors.down?.isDown) {
-            this.fauna.anims.play('fauna-run-down', true)
-            this.fauna.setVelocity(0, speed)
-        } else {
-            const parts = this.fauna.anims.currentAnim.key.split('-')
-            parts[1] = 'idle'
-            this.fauna.play(parts.join('-'))
-            this.fauna.setVelocity(0, 0)
-        }
-
-    }
 
     returnPortalJSON () {
         return{
@@ -336,6 +378,19 @@ export default class Atrium extends Phaser.Scene {
                     "tpY": 1100
                 }
             ]
+        }
+    }
+
+    returnOffsetJSON () {
+        return {
+            "fauna": {
+                "rightOffset": 8.5,
+                "leftOffset": 22
+            },
+            "boy": {
+                "rightOffset": 1,
+                "leftOffset": 16
+            }
         }
     }
 }
