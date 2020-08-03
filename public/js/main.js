@@ -18,7 +18,9 @@ export default class Main extends Phaser.Scene {
 
         // ## PLAYERS ##
         // The main player
-        this.load.atlas('fauna', 'assets/images/fauna.png', 'assets/fauna.json');
+        this.load.atlas('fauna', 'assets/images/fauna.png', 'assets/fauna.json')
+        // Other skins
+        this.load.atlas('boy', 'assets/images/boy.png', 'assets/boy.json')
 
         // ## OBJECTS ##
         this.load.image('portalVert', '/assets/images/portalVert.png')

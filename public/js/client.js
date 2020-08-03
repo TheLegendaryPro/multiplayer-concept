@@ -108,11 +108,15 @@ export default class Client {
     }
 
     changeMap (newMap, oldMap) {
+        // Make the state for client to be not ready, so it won't process other players
         this.ready = false
+        // Emit c for change map to server with new map and old map, and a callback
         this.socket.emit('c', newMap, oldMap, (ark) => {
+            // If the server responded, make ourself ready again
             this.ready = true
-            console.log(this.ready)
+            // Remove all players from the scene
             this.scene.removeAllPlayers()
+            // emit another message to the server with the new map, and the coords of the player
             this.socket.emit('cg', ark, Math.floor(this.scene.fauna.x), Math.floor(this.scene.fauna.y))
         })
     }

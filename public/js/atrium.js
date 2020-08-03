@@ -26,6 +26,7 @@ export default class Atrium extends Phaser.Scene {
         // Add the animation
         this.createPlayerAnimations()
 
+        // Load the map then set it as the current map for the ease of unloading it
         this.currentMap = this.loadMap('atriumSample1', 'atriumSampleTiles')
 
 
@@ -105,48 +106,59 @@ export default class Atrium extends Phaser.Scene {
 
 
     loadMap (mapName, tileName) {
+        // Set up the map and tileset variable
         const map = this.make.tilemap({key: mapName})
         const tileset = map.addTilesetImage(mapName, tileName)
+        // Make a array for storing colliders, then put it inside map for the ease of deleting it
         map.colliders = []
         map.layers.forEach(layer => {
-            // console.log(layer.name)
+            // For each layer, add colliders from the property
             var tempLayer = map.createStaticLayer(layer.name, tileset)
             tempLayer.setCollisionByProperty({collide: true})
             var tempCollider = this.physics.add.collider(this.fauna, tempLayer)
+            // Add it the the colliders array
             map.colliders.push(tempCollider)
         })
+        // Add all portals from the portal JSON
         this.addAllPortals(this.portalJSON, mapName)
+        // Return the map object to be set at as this.currentMap
         return map
     }
 
 
 
     addAllPortals (result, mapName) {
-        console.log('result', result)
-        console.log('mapName', mapName)
+        // Add portal using the object result (JSON) and the map name as the key
+        // Add a array storing portals for the ease of deleting it
         this.portalArray = []
         result[mapName].forEach(portal => {
+            // Add the portal by passing all the parameters from the JSON
             var tempPortal = this.addPortal(portal.x, portal.y, portal.map, portal.tileset, portal.vert, portal.tpX, portal.tpY, mapName)
+            // Push it to the portal array so that we can access it later
             this.portalArray.push(tempPortal)
         })
 
     }
 
     addPortal (x, y, map, tileset, vert, tpX, tpY, mapName) {
-        console.log(x, y, map, tileset, vert, tpX, tpY)
+        // If vertial, add the vertical image, vice versa
         if (vert) {
             var portal = this.physics.add.image(x, y, 'portalVert').setImmovable()
         } else {
             var portal = this.physics.add.image(x, y, 'portalHorz').setImmovable()
         }
+        // Add the collider and name it collider
         var collider = this.physics.add.collider(this.fauna, portal, this.hitPortal, null, this)
+        // Add all the properties to the portal object
         portal.setScale(5, 5)
         portal.oldMap = mapName
         portal.targetMap = map
         portal.targetTileset = tileset
         portal.tpX = tpX
         portal.tpY = tpY
+        // Even the collider get added to the portal object
         portal.collider = collider
+        // Return it and it will be stored inside this.portalArray
         return portal
     }
 
@@ -185,21 +197,25 @@ export default class Atrium extends Phaser.Scene {
     }
 
     hitPortal (fauna, portal) {
-        console.log('portal', portal)
-
+        // Delete all colliders from the map layers
         this.currentMap.colliders.forEach(collider => collider.destroy())
+        // Delete all colliders from the portal
         this.portalArray.forEach(portal => portal.collider.destroy())
-        // // this.testCollider.destroy()
-        // // portalHorz.disableBody(true, true);
+        // Fetch the data from the portal before it is destroyed
         var oldMap = portal.oldMap
         var map = portal.targetMap
         var tileset = portal.targetTileset
         var x = portal.tpX
         var y = portal.tpY
-        portal.destroy()
+        // Now that data is fetched, we can destroy all portals
+        this.portalArray.forEach( tempPortal => tempPortal.destroy())
+        // Destroy the map too
         this.currentMap.destroy()
+        // Then load the new map
         this.currentMap = this.loadMap(map, tileset)
+        // Teleport the player to the correct position
         this.fauna.setPosition(x, y)
+        // Ask the client to emit change map
         screen.client.changeMap(map, oldMap)
 
     }
@@ -241,10 +257,10 @@ export default class Atrium extends Phaser.Scene {
     }
 
     removeAllPlayers () {
+        // Loop through the player map and remove them all
         for (var key in this.playerMap) {
             this.removePlayer(key)
         }
-        console.log("removed all players")
     }
 
     update()

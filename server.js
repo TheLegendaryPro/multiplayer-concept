@@ -66,8 +66,8 @@ io.on('connection', function (socket) {
         // Make a new player
         socket.player = {
             playerID : app.lastPlayerID++,
-            x: 300,
-            y: 350
+            x: 600,
+            y: 1200
         }
         // Add the location of this player to lastPlayerLocation
         app.lastPlayerLocation[socket.player.playerID] = {}
@@ -111,26 +111,33 @@ io.on('connection', function (socket) {
         });
 
         socket.on('c', (newMap, oldMap, ark) => {
-
+            // Make a empty array for rooms the use is in
             var roomArray = []
             for (var key in socket.rooms) {
+                // Add the room to the array
                 var value = socket.rooms[key]
                 roomArray.push(value)
             }
+            // Join the new room
             socket.join(newMap)
+            // Leave all the old rooms, so the user should be only in the new room
             roomArray.forEach(value => {
                 socket.leave(value)
             })
-
+            // Broadcast to all users from the old map to remove this player
             socket.to(oldMap).emit('r', socket.player.playerID)
+            // Send a acknowledgement back to the user
             ark(newMap)
 
         })
 
         socket.on('cg', (newMap, x, y) => {
+            // Set the coords of the player
             socket.player.x = x
             socket.player.y = y
+            // Broadcast to people in the new map that the player joined
             socket.to(newMap).emit('j', socket.player)
+            // Send a respond to the user about other users' locations
             socket.emit('a', getAllPlayers(socket))
         })
     });
@@ -149,19 +156,27 @@ io.on('connection', function (socket) {
     // Set interval is used for updating events every little time period
     setInterval(function(){
 
+        // For each room area
         roomAreas.forEach (areaArray => {
 
             // Initialize it to no players
             var players = []
 
+            // For each room inside the room area
             areaArray.forEach (room => {
+                // For each connected sockets
                 Object.keys(io.sockets.connected).forEach(socketID => {
+                    // Set its name inside room name
                     var roomName
+                    // Loop through the socket's connecte rooms, because only have one, so set it
                     Object.values(io.sockets.connected[socketID].rooms).forEach( tempRoomName => {
                         roomName = tempRoomName
                     })
+                    // If the room name is equal to the room processing
                     if (room == roomName) {
+                        // Extract the player data
                         var player = io.sockets.connected[socketID].player
+                        // If the player moved, add him to the array
                         if (player != undefined && (app.lastPlayerLocation[player.playerID].x != player.x || app.lastPlayerLocation[player.playerID].y != player.y)) {
                             app.lastPlayerLocation[player.playerID].x = player.x
                             app.lastPlayerLocation[player.playerID].y = player.y
@@ -170,12 +185,12 @@ io.on('connection', function (socket) {
                     }
                 })
             })
+            // If there are players that moved, prepare to send the data
             if (players.length) {
-                // socket.volatile.emit('otherlocation', players);
-                // console.log(players)
+                // Create the buffer from encoding it
                 var buffer = Codec.encodePlayerChunk(players)
-                // console.log(buffer)
 
+                // Because we don't know which room it will be sending to, we have to use a eval function
                 var text = "io"
                 areaArray.forEach( name => {
                     text = text + ".to('"
@@ -185,9 +200,6 @@ io.on('connection', function (socket) {
                 text = text + ".volatile.emit('o', buffer)"
                 // console.log('about to eval the following', text)
                 eval(text)
-
-                // io.to('main').volatile.emit('o', buffer);
-                // console.log("otherlocation")
             }
         })
 
@@ -234,14 +246,13 @@ function getAllPlayers(socket) {
     var players = []
     var value
 
+    // Loop through all rooms inside the IO
     Object.keys(io.sockets.adapter.rooms).forEach(function (roomName) {
-        console.log('looping throught this room', roomName)
-
+        // Loop through the room for the PLAYER socket
         Object.keys(socket.rooms).forEach( key => {
-            console.log('looping through room of that player socket')
             value = socket.rooms[key]
         })
-        console.log('value', value)
+        // If the room of io and player matches
         if (roomName == value) {
             console.log('the correct room is', value, io.sockets.adapter.rooms[roomName])
             // Object.keys(io.sockets.adapter.rooms[roomName].sockets).forEach(key => {
@@ -250,6 +261,16 @@ function getAllPlayers(socket) {
         }
         // console.log('iosocketsconnected', io.sockets.connected[value])
     })
+
+    // // Replaced the above with this
+    // Object.keys(socket.rooms).forEach( key => {
+    //     value = socket.rooms[key]
+    // })
+    // console.log(value)
+    // //todo this caused the players to not load?
+
+    //todo get all player not working again? send wrong location when laded?
+    
 
     console.log('now what we know it is', value)
 
