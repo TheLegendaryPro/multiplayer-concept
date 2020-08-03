@@ -62,9 +62,10 @@ app.lastPlayerLocation = {
 // The event handler for socket.io
 io.on('connection', function (socket) {
     // Whenever newplayer is recieved
-    socket.on('n', async function () {
+    socket.on('n', async function (skin) {
         // Make a new player
         socket.player = {
+            skin: skin,
             playerID : app.lastPlayerID++,
             x: 600,
             y: 1200

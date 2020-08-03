@@ -19,7 +19,7 @@ export default class Client {
             // Add players from the allplayer call from server
             console.log('allplayer', data)
             for(var i = 0; i < data.length; i++){
-                this.scene.addNewPlayer(data[i].playerID,data[i].x,data[i].y);
+                this.scene.addNewPlayer(data[i].playerID,data[i].x,data[i].y, data[i].skin);
             }
             // Now that things are loaded, we are ready
             this.ready = true
@@ -51,7 +51,7 @@ export default class Client {
         // The function to add a new player
         this.socket.on('j', (data) => {
             console.log('player join', data)
-            this.scene.addNewPlayer(data.playerID, data.x, data.y)
+            this.scene.addNewPlayer(data.playerID, data.x, data.y, data.skin)
         })
 
         // The function to know what is my id from the server
@@ -98,8 +98,8 @@ export default class Client {
     }
 
     // Ask for the new players
-    askNewPlayer () {
-        this.socket.emit('n')
+    askNewPlayer (skin) {
+        this.socket.emit('n', skin)
     }
 
     // Needed to access the scene, couldn't think of a better way

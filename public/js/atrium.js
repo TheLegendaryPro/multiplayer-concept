@@ -35,7 +35,7 @@ export default class Atrium extends Phaser.Scene {
         // console.log(this.fauna.texture.manager)
         // this.fauna.texture.manager.setTexture(this.fauna, 'fauna')
 
-        this.setSkin("boy")
+        this.setSkin(screen.currentSkin)
 
         // Load the map then set it as the current map for the ease of unloading it
         this.currentMap = this.loadMap('atriumSample1', 'atriumSampleTiles')
@@ -57,7 +57,7 @@ export default class Atrium extends Phaser.Scene {
         this.lastCoord = {x: 0, y: 0}
 
         // Done everything else, now can ask for other players
-        screen.client.askNewPlayer()
+        screen.client.askNewPlayer(screen.currentSkin)
 
         this.fauna.setDepth(1)
     }
@@ -208,8 +208,10 @@ export default class Atrium extends Phaser.Scene {
     }
 
     // Add new players from the object from server
-    addNewPlayer (id, x, y) {
-        this.playerMap[id] = this.add.sprite(x, y, 'fauna', 'walk-down-3.png')
+    addNewPlayer (id, x, y ,skin) {
+        this.playerMap[id] = this.add.sprite(x, y, skin)
+        this.playerMap[id].skin = skin
+        // console.log(this.playerMap[id])
     }
 
 
@@ -248,10 +250,9 @@ export default class Atrium extends Phaser.Scene {
             }
         }
         if (tempDirection == player.tweenDirection) {
-            console.log('true')
             player.anims.resume()
         } else {
-            let parts = ["fauna", "run"]
+            let parts = [this.playerMap[id].skin, "run"]
             parts[2] = player.tweenDirection
             player.anims.play(parts.join("-"), true)
         }
