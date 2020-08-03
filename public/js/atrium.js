@@ -220,7 +220,9 @@ export default class Atrium extends Phaser.Scene {
         // let parts = ["fauna", "idle"]
         // parts[2] = arg.targets[0].tweenDirection
         // arg.targets[0].anims.play(parts.join("-"), true)
-        arg.targets[0].anims.pause()
+        try {
+            arg.targets[0].anims.pause()
+        } catch (err) {}
     }
 
     // Move players from client from server
