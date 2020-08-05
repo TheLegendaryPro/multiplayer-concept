@@ -13,7 +13,6 @@ export default class Atrium extends Phaser.Scene {
         // Controls must be added inside here
         this.cursors = this.input.keyboard.createCursorKeys()
 
-
         // Make it so that client can reference here, stupid code but works
         screen.client.setGameScene(this.game)
 
@@ -23,21 +22,7 @@ export default class Atrium extends Phaser.Scene {
 
     create ()
     {
-        // this.hitArea = this.add.rectangle(0, 0, 300, 300, 0xff0000)
-        // this.hitArea.setInteractive()
-        // console.log(this.hitArea)
-        // this.hitArea.on('pointerdown', function (pointer) {
-        //     this.up = true
-        //     console.log("down")
-        // })
-        // this.hitArea.on('pointerout', function (pointer) {
-        //     this.up = false
-        //     console.log("out")
-        // })
-        // this.hitArea.on('pointerup', function (pointer) {
-        //     this.up = false
-        //     console.log("up")
-        // })
+
         this.input.on("pointerdown", pointer => {
             var deltaX = pointer.downX - 400
             var deltaY = pointer.downY - 300
@@ -61,9 +46,7 @@ export default class Atrium extends Phaser.Scene {
         this.input.on("pointerout", pointer => {
             this.mobileInput = "stop"
         })
-        // var upArea = new Phaser.Geom.Triangle(10, 20, 30, 40, 50, 60, 70, 80, 0xff0000)
-        // console.log(upArea)
-        // upArea.setDepth(2)
+
         // Texture
         // this.currentTexture = new Phaser.Textures.Texture()
         // ## PLAYER ##
@@ -117,9 +100,8 @@ export default class Atrium extends Phaser.Scene {
                 screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
                 this.lastCoord.x = Math.floor(this.fauna.x)
                 this.lastCoord.y = Math.floor(this.fauna.y)
+                // console.log('update location')
             }
-
-
         }
 
 
