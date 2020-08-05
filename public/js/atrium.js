@@ -22,6 +22,31 @@ export default class Atrium extends Phaser.Scene {
 
     create ()
     {
+
+        this.input.on("pointerdown", pointer => {
+            var deltaX = pointer.downX - 400
+            var deltaY = pointer.downY - 300
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) {
+                    this.mobileInput = "right"
+                } else {
+                    this.mobileInput = "left"
+                }
+            } else {
+                if (deltaY > 0) {
+                    this.mobileInput = "down"
+                } else {
+                    this.mobileInput = "up"
+                }
+            }
+        })
+        this.input.on("pointerup", pointer => {
+            this.mobileInput = "stop"
+        })
+        this.input.on("pointerout", pointer => {
+            this.mobileInput = "stop"
+        })
+
         // Texture
         // this.currentTexture = new Phaser.Textures.Texture()
         // ## PLAYER ##
@@ -87,23 +112,23 @@ export default class Atrium extends Phaser.Scene {
         const parts = this.fauna.anims.currentAnim.key.split('-')
         parts[0] = this.skin
 
-        if (this.cursors.left?.isDown) {
+        if (this.cursors.left?.isDown || this.mobileInput == "left") {
             parts[1] = "run"
             parts[2] = "side"
             this.fauna.setVelocity(-speed, 0)
             this.fauna.scaleX = -1
             this.fauna.body.offset.x = this.leftOffset
-        } else if (this.cursors.right?.isDown) {
+        } else if (this.cursors.right?.isDown || this.mobileInput == "right") {
             parts[1] = "run"
             parts[2] = "side"
             this.fauna.setVelocity(speed, 0)
             this.fauna.scaleX = 1
             this.fauna.body.offset.x = this.rightOffset
-        } else if (this.cursors.up?.isDown) {
+        } else if (this.cursors.up?.isDown || this.mobileInput == "up") {
             parts[1] = "run"
             parts[2] = "up"
             this.fauna.setVelocity(0, -speed)
-        } else if (this.cursors.down?.isDown) {
+        } else if (this.cursors.down?.isDown || this.mobileInput == "down") {
             parts[1] = "run"
             parts[2] = "down"
             this.fauna.setVelocity(0, speed)
