@@ -1,0 +1,50 @@
+@charset "UTF-*";
+
+body {
+    margin: auto;
+}
+
+ul {
+    margin: auto;
+}
+
+
+#icon a {
+    line-height: 50px;
+    display: inline;
+    float: left;
+    text-decoration: none;
+    font-size: 20px;
+    margin: 20px 20px;
+    color: #333;
+}
+
+#icon a:hover {
+    color: #F9C;
+}
+
+
+#menu ul {
+    background-color: #CCC;
+    height: 50px;
+    padding: 20px;
+}
+
+#menu ul li {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 11px;
+    line-height: 50px;
+    color: #333;
+    display: inline;
+    margin: 0px 20px;
+    float: right;
+}
+
+#menu ul li a {
+    color: #333;
+    text-decoration: none;
+}
+
+#menu ul li a:hover {
+    color: #F9C;
+}
