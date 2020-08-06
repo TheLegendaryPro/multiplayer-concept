@@ -17,7 +17,6 @@ export default class Client {
         // ALL event handlers, I have no idea where to put them
         this.socket.on('a', (data) => {
             // Add players from the allplayer call from server
-            console.log('allplayer', data)
             for(var i = 0; i < data.length; i++){
                 this.scene.addNewPlayer(data[i].playerID,data[i].x,data[i].y, data[i].skin);
             }
@@ -30,7 +29,6 @@ export default class Client {
             // Don't process until ready
             // console.log("recieved", this.recieveCount++)
             if (!this.ready) return
-            // if (!data) return
 
             // console.log("otherlocation", data)
             // console.log(data[0].id)
@@ -57,9 +55,8 @@ export default class Client {
         // The function to know what is my id from the server
         // Stupid way, but works
         this.socket.on('i', (id) => {
-            console.log('yourid')
             this.scene.fauna.id = id
-            console.log(this.scene.fauna.id)
+            console.log("Our ID is: " + this.scene.fauna.id)
         })
 
         // Remove players
@@ -72,7 +69,7 @@ export default class Client {
 
     // A function to send test, then the server will recieve and log it
     sendTest () {
-        console.log("test sent")
+        console.log("We (client) sent a test to the server")
         this.socket.emit('test', 'content', function (answer) {
             console.log(answer)
         })

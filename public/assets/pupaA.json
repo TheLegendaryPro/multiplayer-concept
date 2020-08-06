@@ -1,0 +1,61 @@
+{
+	"textures": [
+		{
+			"image": "pupaA.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 10,
+				"h": 26
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "pupa.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 10,
+						"h": 16
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 10,
+						"h": 16
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 10,
+						"h": 16
+					}
+				},
+				{
+					"filename": "pupa_smol.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 10,
+						"h": 16
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 6,
+						"w": 9,
+						"h": 10
+					},
+					"frame": {
+						"x": 0,
+						"y": 16,
+						"w": 9,
+						"h": 10
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.6"
+	}
+}

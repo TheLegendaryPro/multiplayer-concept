@@ -79,10 +79,9 @@ io.on('connection', function (socket) {
         socket.emit('i', socket.player.playerID)
         // Tell everyone else there is a new player
         socket.to('atriumSample1').emit('j', socket.player)
-        // Join the main room
+        // Join the main room, and leave all other rooms
         for (var key in socket.rooms) {
             var value = socket.rooms[key]
-            console.log('socketid?', value)
             socket.leave(value)
         }
         await socket.join('atriumSample1')
@@ -107,7 +106,6 @@ io.on('connection', function (socket) {
 
         // Ask all client to delete the player when he disconnects
         socket.on('disconnect',function(){
-
             io.emit('r',socket.player.playerID);
         });
 
@@ -145,8 +143,8 @@ io.on('connection', function (socket) {
 
     // Just a test function when test is recieved
     socket.on('test', function (content, ark) {
-        console.log('test recieved')
-        ark('yes')
+        console.log('We received a test indicating a new connection from a client')
+        ark('The test was well received')
     })
 
 
@@ -235,7 +233,7 @@ io.on('connection', function (socket) {
         //     // console.log("otherlocation")
         // }
         // console.log('otherlocation', players)
-    }, 300); //todo
+    }, 200); //todo
 
 })
 
@@ -247,34 +245,27 @@ function getAllPlayers(socket) {
     var players = []
     var value
 
-    // Loop through all rooms inside the IO
-    Object.keys(io.sockets.adapter.rooms).forEach(function (roomName) {
-        // Loop through the room for the PLAYER socket
-        Object.keys(socket.rooms).forEach( key => {
-            value = socket.rooms[key]
-        })
-        // If the room of io and player matches
-        if (roomName == value) {
-            console.log('the correct room is', value, io.sockets.adapter.rooms[roomName])
-            // Object.keys(io.sockets.adapter.rooms[roomName].sockets).forEach(key => {
-            //     console.log('ppl', key)
-            // })
-        }
-        // console.log('iosocketsconnected', io.sockets.connected[value])
+    Object.keys(socket.rooms).forEach( key => {
+        value = socket.rooms[key]
     })
 
-    // // Replaced the above with this
-    // Object.keys(socket.rooms).forEach( key => {
-    //     value = socket.rooms[key]
+    // DELETED: useless code to make sure that the client is only in one room
+    // Object.keys(io.sockets.adapter.rooms).forEach(function (roomName) {
+    //     // Loop through the room for the PLAYER socket
+    //     Object.keys(socket.rooms).forEach( key => {
+    //         value = socket.rooms[key]
+    //     })
+    //     // If the room of io and player matches
+    //     if (roomName == value) {
+    //         console.log('the correct room is', value, io.sockets.adapter.rooms[roomName])
+    //         // Object.keys(io.sockets.adapter.rooms[roomName].sockets).forEach(key => {
+    //         //     console.log('ppl', key)
+    //         // })
+    //     }
+    //     // console.log('iosocketsconnected', io.sockets.connected[value])
     // })
-    // console.log(value)
-    // //todo this caused the players to not load?
 
-    //todo get all player not working again? send wrong location when laded?
-    
-
-    console.log('now what we know it is', value)
-
+    // Find all sockets to see what players are inside that room
     Object.keys(io.sockets.connected).forEach(function (socketID) {
         // Set player to the socket player object
         var roomName
@@ -287,8 +278,7 @@ function getAllPlayers(socket) {
             if (player != socket.player && player != undefined) players.push(player);
         }
     })
-    // Log it and then return
-    console.log("get all players", players)
+    // return
     return players
 }
 
@@ -300,7 +290,8 @@ function getAllPlayers(socket) {
 
 
 var roomAreas = [
-    ["atriumSample1", "dungeon"]
+    ["atriumSample1", "dungeon"],
+    ["dungeon_sheet"]
 ]
 
 

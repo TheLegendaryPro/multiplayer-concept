@@ -1,4 +1,4 @@
-
+import sceneEvents from "./eventcenter.js"
 
 export default class Atrium extends Phaser.Scene {
 
@@ -18,14 +18,16 @@ export default class Atrium extends Phaser.Scene {
 
         this.portalJSON = this.returnPortalJSON()
         this.offsetJSON = this.returnOffsetJSON()
+        this.dialogJSON = this.returnDialogJOSN()
     }
 
     create ()
     {
+        this.scene.run('game-ui')
 
         this.input.on("pointerdown", pointer => {
-            var deltaX = pointer.downX - 400
-            var deltaY = pointer.downY - 300
+            var deltaX = pointer.downX - window.innerWidth * 0.3
+            var deltaY = pointer.downY - window.innerHeight * 0.3
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 if (deltaX > 0) {
                     this.mobileInput = "right"
@@ -47,19 +49,14 @@ export default class Atrium extends Phaser.Scene {
             this.mobileInput = "stop"
         })
 
-        // Texture
-        // this.currentTexture = new Phaser.Textures.Texture()
         // ## PLAYER ##
         // The sprite
         this.fauna = this.physics.add.sprite(600, 1200, 'fauna')
         this.fauna.body.setSize(15, 25, true)
-        console.log('offset', this.fauna.body.offset.x)
         // Add the animation
         this.createPlayerAnimations()
 
-        // console.log(this.fauna.texture.manager)
-        // this.fauna.texture.manager.setTexture(this.fauna, 'fauna')
-
+        // Set the skin for the player using what was inputted in the previous screen
         this.setSkin(screen.currentSkin)
 
         // Load the map then set it as the current map for the ease of unloading it
@@ -67,8 +64,6 @@ export default class Atrium extends Phaser.Scene {
 
         // Start playing the animations
         this.fauna.anims.play('boy-idle-up')
-
-        // this.fauna.setTexture('boy')
 
         // Make the camera follow the player
         this.cameras.main.startFollow(this.fauna, true)
@@ -85,6 +80,12 @@ export default class Atrium extends Phaser.Scene {
         screen.client.askNewPlayer(screen.currentSkin)
 
         this.fauna.setDepth(1)
+
+        // var convo = this.physics.add.sprite(610, 1230, "npctalk").setDepth(1).setImmovable()
+        // var pupa = this.physics.add.sprite(610, 1240, "pupa").setDepth(1).setImmovable()
+        // this.physics.add.collider(this.fauna, pupa, null, null, this)
+        // this.physics.add.collider(this.fauna, convo, this.hitConvo, null, this)
+
     }
 
     update() {
@@ -153,7 +154,8 @@ export default class Atrium extends Phaser.Scene {
     loadMap (mapName, tileName) {
         // Set up the map and tileset variable
         const map = this.make.tilemap({key: mapName})
-        const tileset = map.addTilesetImage(mapName, tileName)
+        console.log('loaded map')
+        const tileset = map.addTilesetImage(mapName, tileName, 16, 16, 1, 2)
         // Make a array for storing colliders, then put it inside map for the ease of deleting it
         map.colliders = []
         map.layers.forEach(layer => {
@@ -166,8 +168,22 @@ export default class Atrium extends Phaser.Scene {
         })
         // Add all portals from the portal JSON
         this.addAllPortals(this.portalJSON, mapName)
+        this.addAllDialogChars(this.dialogJSON, mapName)
         // Return the map object to be set at as this.currentMap
         return map
+    }
+
+
+    addAllDialogChars(result, mapName) {
+        this.dialogCharArray = []
+        if (result[mapName]) {
+            result[mapName].forEach( dialog => {
+                var tempDialogChar = this.addDialogChar(dialog.x, dialog.y, dialog.type, dialog.character, dialog.content)
+                this.dialogCharArray.push(tempDialogChar)
+            })
+        } else {
+            console.log("Didn't load dialog because this map have none")
+        }
     }
 
 
@@ -184,6 +200,22 @@ export default class Atrium extends Phaser.Scene {
         })
 
     }
+
+    addDialogChar (x, y, type, character, content) {
+        var dialog = this.physics.add.sprite(x + 10, y - 10, "npctalk").setDepth(1)
+        dialog.setFrame(type + ".png")
+        var dialogChar = this.physics.add.sprite(x, y, character).setDepth(1).setImmovable()
+
+        // var dialogCollider = this.physics.add.collider(this.fauna, dialog)
+        var charCollider = this.physics.add.collider(this.fauna, dialogChar, this.hitDialogChar, null, this)
+
+        dialogChar.content = content
+        // dialogChar.dialogCollider = dialogCollider
+        dialogChar.collider = charCollider
+        dialogChar.dialog = dialog
+        return dialogChar
+    }
+
 
     addPortal (x, y, map, tileset, vert, tpX, tpY, mapName) {
         // If vertial, add the vertical image, vice versa
@@ -207,6 +239,12 @@ export default class Atrium extends Phaser.Scene {
         return portal
     }
 
+    hitDialogChar (fauna, dialogChar) {
+        dialogChar.dialog.destroy()
+        dialogChar.collider.destroy()
+        sceneEvents.emit("startDialog", dialogChar.content)
+    }
+
 
     hitPortal (fauna, portal) {
         // Delete all colliders from the map layers
@@ -221,6 +259,15 @@ export default class Atrium extends Phaser.Scene {
         var y = portal.tpY
         // Now that data is fetched, we can destroy all portals
         this.portalArray.forEach( tempPortal => tempPortal.destroy())
+
+        // destroy dialogChars
+        this.dialogCharArray.forEach( dialogChar => {
+            // console.log(dialogChar.collider)
+            if (dialogChar.collider.active) dialogChar.collider.destroy()
+            if (dialogChar.dialog) dialogChar.dialog.destroy()
+            dialogChar.destroy()
+        })
+
         // Destroy the map too
         this.currentMap.destroy()
         // Then load the new map
@@ -231,6 +278,13 @@ export default class Atrium extends Phaser.Scene {
         screen.client.changeMap(map, oldMap)
 
     }
+
+
+    // hitConvo (fauna, convo) {
+    //     convo.destroy()
+    //     console.log("hit pupa")
+    //     sceneEvents.emit("test1312", ['yo', 'hello there', 'do you know who I am?'])
+    // }
 
     // Add new players from the object from server
     addNewPlayer (id, x, y ,skin) {
@@ -291,7 +345,7 @@ export default class Atrium extends Phaser.Scene {
             targets: player,
             x: x,
             y: y,
-            duration: 250, //todo
+            duration: 200, //todo
             // onStart: this.startTween,
             onComplete: this.endTween
         }
@@ -404,6 +458,26 @@ export default class Atrium extends Phaser.Scene {
                     "vert": true,
                     "tpX": 600,
                     "tpY": 1100
+                },
+                {
+                    "x": 150,
+                    "y": 150,
+                    "map": "dungeon_sheet",
+                    "tileset": "dungeon_sheetTiles",
+                    "vert": false,
+                    "tpX": 100,
+                    "tpY": 100
+                }
+            ],
+            "dungeon_sheet": [
+                {
+                    "x": 200,
+                    "y": 100,
+                    "map": "dungeon",
+                    "tileset": "tiles",
+                    "vert": false,
+                    "tpX": 100,
+                    "tpY": 100
                 }
             ]
         }
@@ -419,6 +493,30 @@ export default class Atrium extends Phaser.Scene {
                 "rightOffset": 1,
                 "leftOffset": 16
             }
+        }
+    }
+
+    returnDialogJOSN () {
+        return {
+            "atriumSample1": [
+                {
+                    "type": "talk3",
+                    "character": "pupa",
+                    "x": 800,
+                    "y": 1250,
+                    "content": ["Hi there (press or click on here to continue)", "Welcome to HKUST", "feel free to explore around here"]
+                }
+            ],
+            "dungeon_sheet": [
+                {
+                    "type": "exclamation",
+                    "character": "boy",
+                    "x": 200,
+                    "y": 150,
+                    "content": ["this is a threat", "lmao"]
+                }
+            ]
+
         }
     }
 }

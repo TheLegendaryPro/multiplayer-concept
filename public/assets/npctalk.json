@@ -1,0 +1,145 @@
+{
+	"textures": [
+		{
+			"image": "npctalk.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 78,
+				"h": 12
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "exclamation.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				},
+				{
+					"filename": "question.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 13,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				},
+				{
+					"filename": "talk0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 26,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				},
+				{
+					"filename": "talk1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 39,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				},
+				{
+					"filename": "talk2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 52,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				},
+				{
+					"filename": "talk3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 13,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					},
+					"frame": {
+						"x": 65,
+						"y": 0,
+						"w": 13,
+						"h": 12
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.6"
+	}
+}

@@ -10,11 +10,16 @@ export default class Main extends Phaser.Scene {
 
         // ## SCENES ##
         // The dungeon scene
-        this.load.image('tiles', 'assets/images/dungeon_tiles.png');
+        this.load.image('tiles', 'assets/images/dungeon_tiles_extruded.png');
         this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
         // The atrium scene
-        this.load.image('atriumSampleTiles', 'assets/images/atriumSample1.png')
+        this.load.image('atriumSampleTiles', 'assets/images/atriumSample1_extruded.png')
         this.load.tilemapTiledJSON('atriumSample1', 'assets/atriumSample1.json')
+
+        this.load.image('dungeon_sheetTiles', 'assets/images/dungeon_sheet_extruded.png')
+        // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
+        this.load.tilemapTiledJSON('dungeon_sheet', 'assets/hopefully.json')
+        // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
 
         // ## PLAYERS ##
         // The main player
@@ -22,9 +27,15 @@ export default class Main extends Phaser.Scene {
         // Other skins
         this.load.atlas('boy', 'assets/images/boy.png', 'assets/boy.json')
 
+        // ## NPCS ##
+        this.load.atlas('pupa', 'assets/images/pupaA.png', 'assets/pupaA.json')
+        this.load.atlas('npctalk', 'assets/images/npctalk.png', 'assets/npctalk.json')
+
         // ## OBJECTS ##
         this.load.image('portalVert', '/assets/images/portalVert.png')
         this.load.image('portalHorz', '/assets/images/portalHorz.png')
+
+        this.load.image("textbox", "assets/images/textbox.png")
 
 
     };
