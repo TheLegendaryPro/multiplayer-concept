@@ -14,13 +14,14 @@ ul {
     display: inline;
     float: left;
     text-decoration: none;
-    font-size: 20px;
+    font-size: 30px;
+    font-weight: bold;
     margin: 20px 20px;
     color: #333;
 }
 
 #icon a:hover {
-    color: #F9C;
+    color: #6d351b;
 }
 
 
@@ -28,16 +29,17 @@ ul {
     background-color: #CCC;
     height: 50px;
     padding: 20px;
+    text-align: right;
+
 }
 
 #menu ul li {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    font-size: 11px;
+    font-size: 15px;
     line-height: 50px;
     color: #333;
     display: inline;
     margin: 0px 20px;
-    float: right;
 }
 
 #menu ul li a {

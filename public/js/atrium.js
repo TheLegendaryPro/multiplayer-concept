@@ -113,23 +113,24 @@ export default class Atrium extends Phaser.Scene {
         const parts = this.fauna.anims.currentAnim.key.split('-')
         parts[0] = this.skin
 
-        if (this.cursors.left?.isDown || this.mobileInput == "left") {
+        // remarks: I removed the ? after left, right, up and down, cause I couldn't obfuscate with them
+        if (this.cursors.left.isDown || this.mobileInput == "left") {
             parts[1] = "run"
             parts[2] = "side"
             this.fauna.setVelocity(-speed, 0)
             this.fauna.scaleX = -1
             this.fauna.body.offset.x = this.leftOffset
-        } else if (this.cursors.right?.isDown || this.mobileInput == "right") {
+        } else if (this.cursors.right.isDown || this.mobileInput == "right") {
             parts[1] = "run"
             parts[2] = "side"
             this.fauna.setVelocity(speed, 0)
             this.fauna.scaleX = 1
             this.fauna.body.offset.x = this.rightOffset
-        } else if (this.cursors.up?.isDown || this.mobileInput == "up") {
+        } else if (this.cursors.up.isDown || this.mobileInput == "up") {
             parts[1] = "run"
             parts[2] = "up"
             this.fauna.setVelocity(0, -speed)
-        } else if (this.cursors.down?.isDown || this.mobileInput == "down") {
+        } else if (this.cursors.down.isDown || this.mobileInput == "down") {
             parts[1] = "run"
             parts[2] = "down"
             this.fauna.setVelocity(0, speed)
@@ -478,7 +479,34 @@ export default class Atrium extends Phaser.Scene {
                     "vert": false,
                     "tpX": 100,
                     "tpY": 100
+                },
+                {
+                    "x": 250,
+                    "y": 100,
+                    "map": "SGT",
+                    "tileset": "SGTiles",
+                    "vert": false,
+                    "tpX": 50,
+                    "tpY": 50
                 }
+            ],
+            "CYTUG-2": [
+
+            ],
+            "LG5": [
+
+            ],
+            "AC1": [
+
+            ],
+            "frogRoad": [
+
+            ],
+            "atrium": [
+
+            ],
+            "SGT": [
+
             ]
         }
     }

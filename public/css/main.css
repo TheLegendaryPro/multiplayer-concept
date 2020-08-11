@@ -9,3 +9,28 @@
 .beforeLoad {
     text-align: center;
 }
+
+.credit {
+    border-left: 6px solid rgba(33, 150, 243, 0.7);
+    background: rgba(211, 255, 255, 0.5);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-right: 25px;
+    margin-left: 25px;
+}
+
+.credit h2 {
+    color: darkblue;
+}
+
+.credit p {
+    text-align: right;
+}
+
+.credit a {
+    text-decoration: none;
+}
+
+.credit h3 {
+    text-align: right;
+}
