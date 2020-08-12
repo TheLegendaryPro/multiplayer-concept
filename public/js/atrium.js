@@ -51,8 +51,8 @@ export default class Atrium extends Phaser.Scene {
 
         // ## PLAYER ##
         // The sprite
-        this.fauna = this.physics.add.sprite(600, 1200, 'fauna')
-        this.fauna.body.setSize(15, 25, true)
+        this.fauna = this.physics.add.sprite(220, 710, 'fauna')
+        this.fauna.body.setSize(10, 10, true)
         // Add the animation
         this.createPlayerAnimations()
 
@@ -60,7 +60,7 @@ export default class Atrium extends Phaser.Scene {
         this.setSkin(screen.currentSkin)
 
         // Load the map then set it as the current map for the ease of unloading it
-        this.currentMap = this.loadMap('atriumSample1', 'atriumSampleTiles')
+        this.currentMap = this.loadMap('frogRoad', 'frogRoadTiles')
 
         // Start playing the animations
         this.fauna.anims.play('boy-idle-up')
@@ -81,6 +81,7 @@ export default class Atrium extends Phaser.Scene {
 
         this.fauna.setDepth(1)
 
+
         // var convo = this.physics.add.sprite(610, 1230, "npctalk").setDepth(1).setImmovable()
         // var pupa = this.physics.add.sprite(610, 1240, "pupa").setDepth(1).setImmovable()
         // this.physics.add.collider(this.fauna, pupa, null, null, this)
@@ -95,7 +96,7 @@ export default class Atrium extends Phaser.Scene {
         }
 
         // The stupid code that limites the data transfer rate
-        if (this.updateCounter++ % 10 === 0) { //todo
+        if (this.updateCounter++ % 15 === 0) {
             // Send the location integer only when there is change
             if (this.lastCoord.x != Math.floor(this.fauna.x) || this.lastCoord.y != Math.floor(this.fauna.y)) {
                 screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
@@ -107,7 +108,7 @@ export default class Atrium extends Phaser.Scene {
 
 
         // The code to make moveing work
-        const speed = 100
+        const speed = 150 //todo
 
         // this.fauna.setTexture('boy')
         const parts = this.fauna.anims.currentAnim.key.split('-')
@@ -289,6 +290,7 @@ export default class Atrium extends Phaser.Scene {
 
     // Add new players from the object from server
     addNewPlayer (id, x, y ,skin) {
+        if (this.playerMap[id] != undefined) return
         this.playerMap[id] = this.add.sprite(x, y, skin)
         this.playerMap[id].skin = skin
         // console.log(this.playerMap[id])
@@ -339,14 +341,14 @@ export default class Atrium extends Phaser.Scene {
             player.anims.play(parts.join("-"), true)
         }
 
-
+        var tweenDelay = screen.client.delay
 
         // Set up the config for tween
         var config = {
             targets: player,
             x: x,
             y: y,
-            duration: 200, //todo
+            duration: tweenDelay,
             // onStart: this.startTween,
             onComplete: this.endTween
         }
@@ -439,74 +441,147 @@ export default class Atrium extends Phaser.Scene {
 
     returnPortalJSON () {
         return{
-            "atriumSample1": [
+            "frogRoad": [
                 {
-                    "x": 700,
-                    "y": 1050,
-                    "map": "dungeon",
-                    "tileset": "tiles",
-                    "vert": false,
-                    "tpX": 100,
-                    "tpY": 100
-                }
-            ],
-            "dungeon": [
-                {
-                    "x": 50,
-                    "y": 50,
-                    "map": "atriumSample1",
-                    "tileset": "atriumSampleTiles",
+                    "x": 4180,
+                    "y": 30,
+                    "map": "fireChick",
+                    "tileset": "fireChickTiles",
                     "vert": true,
-                    "tpX": 600,
-                    "tpY": 1100
-                },
-                {
-                    "x": 150,
-                    "y": 150,
-                    "map": "dungeon_sheet",
-                    "tileset": "dungeon_sheetTiles",
-                    "vert": false,
-                    "tpX": 100,
-                    "tpY": 100
+                    "tpX": 230,
+                    "tpY": 2240
                 }
             ],
-            "dungeon_sheet": [
+            "fireChick": [
+                {
+                    "x": 1580,
+                    "y": 25,
+                    "map": "atrium",
+                    "tileset": "atriumTiles",
+                    "vert": false,
+                    "tpX": 970,
+                    "tpY": 2120
+                },
                 {
                     "x": 200,
-                    "y": 100,
-                    "map": "dungeon",
-                    "tileset": "tiles",
-                    "vert": false,
-                    "tpX": 100,
-                    "tpY": 100
-                },
-                {
-                    "x": 250,
-                    "y": 100,
-                    "map": "SGT",
-                    "tileset": "SGTiles",
-                    "vert": false,
-                    "tpX": 50,
-                    "tpY": 50
+                    "y": 2240,
+                    "map": "frogRoad",
+                    "tileset": "frogRoadTiles",
+                    "vert": true,
+                    "tpX": 4180,
+                    "tpY": 30
                 }
             ],
-            "CYTUG-2": [
-
+            "atrium": [
+                {
+                    "x": 970,
+                    "y": 2210,
+                    "map": "fireChick",
+                    "tileset": "fireChickTiles",
+                    "vert": false,
+                    "tpX": 1580,
+                    "tpY": 45
+                },
+                {
+                    "x": 310,
+                    "y": 330,
+                    "map": "LG5",
+                    "tileset": "LG5Tiles",
+                    "vert": false,
+                    "tpX": 2380,
+                    "tpY": 60
+                },
+                {
+                    "x": 1740,
+                    "y": 1290,
+                    "map": "AC1",
+                    "tileset": "AC1Tiles",
+                    "vert": true,
+                    "tpX": 65,
+                    "tpY": 260
+                }
             ],
             "LG5": [
-
+                {
+                    "x": 2380,
+                    "y": 25,
+                    "map": "atrium",
+                    "tileset": "atriumTiles",
+                    "vert": false,
+                    "tpX": 310,
+                    "tpY": 360
+                }
             ],
             "AC1": [
-
+                {
+                    "x": 35,
+                    "y": 260,
+                    "map": "atrium",
+                    "tileset": "atriumTiles",
+                    "vert": true,
+                    "tpX": 1710,
+                    "tpY": 1290
+                },
+                {
+                    "x": 1685,
+                    "y": 270,
+                    "map": "AC2",
+                    "tileset": "AC2Tiles",
+                    "vert": true,
+                    "tpX": 70,
+                    "tpY": 600
+                }
             ],
-            "frogRoad": [
-
+            "AC2": [
+                {
+                    "x": 10,
+                    "y": 600,
+                    "map": "AC1",
+                    "tileset": "AC1Tiles",
+                    "vert": true,
+                    "tpX": 1665,
+                    "tpY": 270
+                },
+                {
+                    "x": 2180,
+                    "y": 610,
+                    "map": "CYT1",
+                    "tileset": "CYT1Tiles",
+                    "vert": true,
+                    "tpX": 70,
+                    "tpY": 160
+                }
             ],
-            "atrium": [
-
+            "CYT1": [
+                {
+                    "x": 50,
+                    "y": 160,
+                    "map": "AC2",
+                    "tileset": "AC2Tiles",
+                    "vert": true,
+                    "tpX": 2140,
+                    "tpY": 610
+                },
+                {
+                    "x": 1435,
+                    "y": 125,
+                    "map": "SG",
+                    "tileset": "SGTiles",
+                    "vert": true,
+                    "tpX": 85,
+                    "tpY": 850
+                }
             ],
-            "SGT": [
-
+            "SG": [
+                {
+                    "x": 45,
+                    "y": 850,
+                    "map": "CYT1",
+                    "tileset": "CYT1Tiles",
+                    "vert": true,
+                    "tpX": 1415,
+                    "tpY": 125
+                }
             ]
         }
     }
@@ -526,22 +601,13 @@ export default class Atrium extends Phaser.Scene {
 
     returnDialogJOSN () {
         return {
-            "atriumSample1": [
+            "atrium": [
                 {
                     "type": "talk3",
                     "character": "pupa",
                     "x": 800,
                     "y": 1250,
                     "content": ["Hi there (press or click on here to continue)", "Welcome to HKUST", "feel free to explore around here"]
-                }
-            ],
-            "dungeon_sheet": [
-                {
-                    "type": "exclamation",
-                    "character": "boy",
-                    "x": 200,
-                    "y": 150,
-                    "content": ["this is a threat", "lmao"]
                 }
             ]
 

@@ -67,8 +67,8 @@ io.on('connection', function (socket) {
         socket.player = {
             skin: skin,
             playerID : app.lastPlayerID++,
-            x: 600,
-            y: 1200
+            x: 220,
+            y: 710
         }
         // Add the location of this player to lastPlayerLocation
         app.lastPlayerLocation[socket.player.playerID] = {}
@@ -78,13 +78,13 @@ io.on('connection', function (socket) {
 
         socket.emit('i', socket.player.playerID)
         // Tell everyone else there is a new player
-        socket.to('atriumSample1').emit('j', socket.player)
+        socket.to('frogRoad').emit('j', socket.player)
         // Join the main room, and leave all other rooms
         for (var key in socket.rooms) {
             var value = socket.rooms[key]
             socket.leave(value)
         }
-        await socket.join('atriumSample1')
+        await socket.join('frogRoad')
         socket.emit('a', getAllPlayers(socket))
 
         // UpdateLocation
@@ -233,7 +233,7 @@ io.on('connection', function (socket) {
         //     // console.log("otherlocation")
         // }
         // console.log('otherlocation', players)
-    }, 200); //todo
+    }, 300); //todo
 
 })
 
@@ -290,8 +290,8 @@ function getAllPlayers(socket) {
 
 
 var roomAreas = [
-    ["atriumSample1", "dungeon"],
-    ["dungeon_sheet"]
+    ["LG5", "frogRoad", "atrium", "AC1", "fireChick"],
+    ["dungeon_sheet", "dungeon", "CYT1", "SG"]
 ]
 
 

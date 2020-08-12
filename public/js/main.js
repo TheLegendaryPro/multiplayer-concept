@@ -10,34 +10,39 @@ export default class Main extends Phaser.Scene {
 
         // ## SCENES ##
         // The dungeon scene
-        this.load.image('tiles', 'assets/images/dungeon_tiles_extruded.png');
-        this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
-        // The atrium scene
-        this.load.image('atriumSampleTiles', 'assets/images/atriumSample1_extruded.png')
-        this.load.tilemapTiledJSON('atriumSample1', 'assets/atriumSample1.json')
+        // this.load.image('tiles', 'assets/images/dungeon_tiles_extruded.png');
+        // this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
+        // // The atrium scene
+        //
+        // this.load.image('dungeon_sheetTiles', 'assets/images/dungeon_sheet_extruded.png')
+        // // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
+        // this.load.tilemapTiledJSON('dungeon_sheet', 'assets/hopefully.json')
+        // // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
 
-        this.load.image('dungeon_sheetTiles', 'assets/images/dungeon_sheet_extruded.png')
-        // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
-        this.load.tilemapTiledJSON('dungeon_sheet', 'assets/hopefully.json')
-        // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
 
-        this.load.image('CYTUG-1Tiles', 'assets/images/CYTUG-2_extruded.png')
-        this.load.tilemapTiledJSON('CYTUG-2', 'assets/CYTUG-2map.JSON')
+        this.load.image('atriumTiles', 'assets/images/atrium_extruded.png')
+        this.load.tilemapTiledJSON('atrium', 'assets/atriummap.json')
+
+        this.load.image('CYT1Tiles', 'assets/images/CYT1_extruded.png')
+        this.load.tilemapTiledJSON('CYT1', 'assets/CYT1map.JSON')
 
         this.load.image('LG5Tiles', 'assets/images/LG5_extruded.png')
         this.load.tilemapTiledJSON('LG5', 'assets/LG5map.json')
 
         this.load.image('AC1Tiles', 'assets/images/AC1_extruded.png')
-        this.load.tilemapTiledJSON('AC1', 'assets/academicConcourse1map.json')
+        this.load.tilemapTiledJSON('AC1', 'assets/AC1map.json')
 
-        this.load.image('FRTiles', 'assets/images/frogRoad_extruded.png')
+        this.load.image('frogRoadTiles', 'assets/images/frogRoad_extruded.png')
         this.load.tilemapTiledJSON('frogRoad', 'assets/frogRoadmap.json')
 
-        this.load.image('fireChickTiles', 'assets/images/atrium_extruded.png')
-        this.load.tilemapTiledJSON('atrium', 'assets/fireChickmap.json')
+        this.load.image('fireChickTiles', 'assets/images/fireChick_extruded.png')
+        this.load.tilemapTiledJSON('fireChick', 'assets/fireChickmap.json')
 
-        this.load.image('SGTiles', 'assets/images/SGT_extruded.png')
-        this.load.tilemapTiledJSON('SGT', 'assets/southGateV3.json')
+        this.load.image('SGTiles', 'assets/images/SG_extruded.png')
+        this.load.tilemapTiledJSON('SG', 'assets/SGmap.json')
+
+        this.load.image('AC2Tiles', 'assets/images/AC2_extruded.png')
+        this.load.tilemapTiledJSON('AC2', 'assets/AC2map.json')
 
         // ## PLAYERS ##
         // The main player

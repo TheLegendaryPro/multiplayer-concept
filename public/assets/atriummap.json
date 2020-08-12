@@ -96,11 +96,11 @@
         {
          "columns":7,
          "firstgid":1,
-         "image":"images\/atriumSample1.png",
+         "image":"atrium.png",
          "imageheight":80,
          "imagewidth":112,
          "margin":0,
-         "name":"atriumSample1",
+         "name":"atrium",
          "spacing":0,
          "tilecount":35,
          "tileheight":16,

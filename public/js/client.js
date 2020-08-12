@@ -10,8 +10,8 @@ export default class Client {
         // Connect to socket.io
         this.socket = io.connect()
 
-        //todo remove it
-        this.recieveCount = 0
+        this.tempTime = Date.now()
+        this.delay = 300
 
 
         // ALL event handlers, I have no idea where to put them
@@ -27,8 +27,18 @@ export default class Client {
         this.socket.on('o', (buffer) => {
             // The constant update of location
             // Don't process until ready
-            // console.log("recieved", this.recieveCount++)
             if (!this.ready) return
+
+            var tempDelay = Date.now() - this.tempTime
+            if (tempDelay < 1000) {
+                if (tempDelay < this.delay) {
+                    this.delay--
+                } else {
+                    this.delay++
+                }
+            }
+            // this.delay = (tempDelay < 1000) ? tempDelay : 300
+            this.tempTime = Date.now()
 
             // console.log("otherlocation", data)
             // console.log(data[0].id)
