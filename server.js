@@ -50,23 +50,29 @@ server.listen(process.env.PORT || 80, () => {
 })
 
 
-// A stupid ID system that adds one everytiime someone connects
-app.lastPlayerID = 0
+
 // A object to store locations of players
 app.lastPlayerLocation = {
     // Contains id: {x:x, y:y}
 }
 
 
-
 // The event handler for socket.io
 io.on('connection', function (socket) {
     // Whenever newplayer is recieved
     socket.on('n', async function (skin) {
+        var usedIDs = []
+        Object.keys(io.sockets.connected).forEach( socketID => {
+            var player = io.sockets.connected[socketID].player
+            if (player == undefined) return
+            usedIDs.push(player.playerID)
+        })
+        var unusedID = 0
+        while (usedIDs.includes(unusedID)) unusedID++
         // Make a new player
         socket.player = {
             skin: skin,
-            playerID : app.lastPlayerID++,
+            playerID : unusedID,
             x: 220,
             y: 710
         }

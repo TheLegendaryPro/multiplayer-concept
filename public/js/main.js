@@ -6,6 +6,9 @@ export default class Main extends Phaser.Scene {
     }
 
     preload () {
+        this.introText = this.add.text(screen.gameWidth * 0.5 - 4*30, 20, "USTown.live", { fontSize: "30px"})
+        this.waitingText = this.add.text(screen.gameWidth * 0.5 - 6*30, 60, "Please wait for the game to load", { fontSize: "16px"})
+        this.authorText = this.add.text(screen.gameWidth * 0.1, screen.gameHeight * 0.8, "By Chit", { fontSize: "25px"})
         // supposed to load everything here
 
         // ## SCENES ##
@@ -24,7 +27,7 @@ export default class Main extends Phaser.Scene {
         this.load.tilemapTiledJSON('atrium', 'assets/atriummap.json')
 
         this.load.image('CYT1Tiles', 'assets/images/CYT1_extruded.png')
-        this.load.tilemapTiledJSON('CYT1', 'assets/CYT1map.JSON')
+        this.load.tilemapTiledJSON('CYT1', 'assets/CYT1map.json')
 
         this.load.image('LG5Tiles', 'assets/images/LG5_extruded.png')
         this.load.tilemapTiledJSON('LG5', 'assets/LG5map.json')
@@ -68,7 +71,7 @@ export default class Main extends Phaser.Scene {
         let skinList = ["fauna", "boy"]
         let skinIndex = 0
         screen.currentSkin = skinList[skinIndex]
-        var skinText = this.add.text(100, 100, "Click to choose skin: " + screen.currentSkin).setInteractive()
+        var skinText = this.add.text(screen.gameWidth * 0.5 - 150, 100, "Click to choose skin: " + screen.currentSkin).setInteractive()
         skinText.on('pointerdown', function (pointer) {
             if (skinIndex < skinList.length - 1) {
                 skinIndex += 1
@@ -80,7 +83,7 @@ export default class Main extends Phaser.Scene {
         })
 
         var tempThis = this
-        var startText = this.add.text(100, 150, "Click to start game").setInteractive()
+        var startText = this.add.text(screen.gameWidth * 0.5 - 150, 150, "Click to start game", { fontSize: "25px", color: "rgb(254,180,92)"}).setInteractive()
         startText.on('pointerdown', function (pointer) {
             // Start the scene
             var test = tempThis.scene.start('Atrium');

@@ -81,6 +81,8 @@ export default class Atrium extends Phaser.Scene {
 
         this.fauna.setDepth(1)
 
+        this.readyToTeleport = true
+
 
         // var convo = this.physics.add.sprite(610, 1230, "npctalk").setDepth(1).setImmovable()
         // var pupa = this.physics.add.sprite(610, 1240, "pupa").setDepth(1).setImmovable()
@@ -96,7 +98,8 @@ export default class Atrium extends Phaser.Scene {
         }
 
         // The stupid code that limites the data transfer rate
-        if (this.updateCounter++ % 15 === 0) {
+        if (this.updateCounter++ % 17 === 0) {
+            // console.log(this.updateCounter)
             // Send the location integer only when there is change
             if (this.lastCoord.x != Math.floor(this.fauna.x) || this.lastCoord.y != Math.floor(this.fauna.y)) {
                 screen.client.sendLocation(Math.floor(this.fauna.x), Math.floor(this.fauna.y))
@@ -150,10 +153,12 @@ export default class Atrium extends Phaser.Scene {
         this.leftOffset = this.offsetJSON[skinName].leftOffset
         this.rightOffset = this.offsetJSON[skinName].rightOffset
         this.fauna.body.offset.x = this.rightOffset
+        this.fauna.body.offset.y = 20
     }
 
 
     loadMap (mapName, tileName) {
+        this.readyToTeleport = false
         // Set up the map and tileset variable
         const map = this.make.tilemap({key: mapName})
         console.log('loaded map')
@@ -172,6 +177,9 @@ export default class Atrium extends Phaser.Scene {
         this.addAllPortals(this.portalJSON, mapName)
         this.addAllDialogChars(this.dialogJSON, mapName)
         // Return the map object to be set at as this.currentMap
+        setTimeout( () => {
+            this.readyToTeleport = true
+        }, 5000)
         return map
     }
 
@@ -249,6 +257,7 @@ export default class Atrium extends Phaser.Scene {
 
 
     hitPortal (fauna, portal) {
+        if (!this.readyToTeleport) return
         // Delete all colliders from the map layers
         this.currentMap.colliders.forEach(collider => collider.destroy())
         // Delete all colliders from the portal
@@ -314,8 +323,9 @@ export default class Atrium extends Phaser.Scene {
         var player = this.playerMap[id]
         if (player == undefined) return
         // var distance = Phaser.Math.Distance.Between(player.x,player.y,x,y);
-
-
+        //
+        // console.log(this.fauna.x, x)
+        // console.log(this.fauna.y, y)
         let tempDirection = player.tweenDirection
 
         if (Math.abs(player.x - x) > Math.abs(player.y - y)) {
@@ -341,7 +351,9 @@ export default class Atrium extends Phaser.Scene {
             player.anims.play(parts.join("-"), true)
         }
 
-        var tweenDelay = screen.client.delay
+
+        var tweenDelay = screen.client.delay + Object.keys(this.playerMap).length * 20
+        // console.log(tweenDelay)
 
         // Set up the config for tween
         var config = {
@@ -362,6 +374,8 @@ export default class Atrium extends Phaser.Scene {
 
     // Remove players when server tell us to
     removePlayer (id) {
+        console.log(this.playerMap[id])
+        if (this.playerMap[id] == undefined) return
         this.playerMap[id].destroy();
         delete this.playerMap[id];
     }
@@ -444,12 +458,12 @@ export default class Atrium extends Phaser.Scene {
             "frogRoad": [
                 {
                     "x": 4180,
-                    "y": 30,
+                    "y": 50,
                     "map": "fireChick",
                     "tileset": "fireChickTiles",
                     "vert": true,
                     "tpX": 230,
-                    "tpY": 2240
+                    "tpY": 2300
                 }
             ],
             "fireChick": [
@@ -464,12 +478,12 @@ export default class Atrium extends Phaser.Scene {
                 },
                 {
                     "x": 200,
-                    "y": 2240,
+                    "y": 2300,
                     "map": "frogRoad",
                     "tileset": "frogRoadTiles",
                     "vert": true,
                     "tpX": 4180,
-                    "tpY": 30
+                    "tpY": 50
                 }
             ],
             "atrium": [
@@ -484,7 +498,7 @@ export default class Atrium extends Phaser.Scene {
                 },
                 {
                     "x": 310,
-                    "y": 330,
+                    "y": 160,
                     "map": "LG5",
                     "tileset": "LG5Tiles",
                     "vert": false,
@@ -509,7 +523,7 @@ export default class Atrium extends Phaser.Scene {
                     "tileset": "atriumTiles",
                     "vert": false,
                     "tpX": 310,
-                    "tpY": 360
+                    "tpY": 190
                 }
             ],
             "AC1": [

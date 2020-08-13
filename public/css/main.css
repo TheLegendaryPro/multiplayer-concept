@@ -24,7 +24,9 @@
 }
 
 .credit p {
-    text-align: right;
+    text-align: left;
+    font-size: 16px;
+    font-family: Georgia;
 }
 
 .credit a {
