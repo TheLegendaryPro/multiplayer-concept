@@ -5,6 +5,11 @@
     <title>USTown.live</title>
     <link rel="stylesheet" href="css/horizontal_menu.css">
     <link rel="stylesheet" href="css/main.css">
+    <script>
+        if (location.host == "ustown.live" && location.protocol !== 'https:') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
 </head>
 <body>
 <div id="icon">
@@ -21,9 +26,9 @@
 </div>
 <div class="game" id="game"></div>
 <div class="beforeLoad">
-    <h1>Welcome to this game!</h1>
-    <p>The purpose of this game is to let you be familiar with the environment before entering HKUST</p>
-    <p>We hope you enjoy it</p>
+    <h1>Welcome to USTown.live</h1>
+    <p>This game is made to let you be familiar with the environment before entering HKUST</p>
+    <p>I hope you enjoy it</p>
     <p>Now please give the game some time to load, the first time takes longer</p>
 </div>
 

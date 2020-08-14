@@ -26,7 +26,7 @@ ul {
 
 
 #menu ul {
-    background-color: #CCC;
+    background-color: rgb(193, 218, 236);
     height: 50px;
     padding: 20px;
     text-align: right;
@@ -35,7 +35,7 @@ ul {
 
 #menu ul li {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    font-size: 15px;
+    font-size: 17px;
     line-height: 50px;
     color: #333;
     display: inline;

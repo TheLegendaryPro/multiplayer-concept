@@ -12,15 +12,8 @@ export default class Main extends Phaser.Scene {
         // supposed to load everything here
 
         // ## SCENES ##
-        // The dungeon scene
-        // this.load.image('tiles', 'assets/images/dungeon_tiles_extruded.png');
-        // this.load.tilemapTiledJSON('dungeon', 'assets/map.json');
-        // // The atrium scene
-        //
-        // this.load.image('dungeon_sheetTiles', 'assets/images/dungeon_sheet_extruded.png')
-        // // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
-        // this.load.tilemapTiledJSON('dungeon_sheet', 'assets/hopefully.json')
-        // // THIS NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
+        // tilemapTiledJSON NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
+        // tilemapTiledJSON NAME MUST BE THE SAME AS THE TILESHEET PNG NAME
 
 
         this.load.image('atriumTiles', 'assets/images/atrium_extruded.png')

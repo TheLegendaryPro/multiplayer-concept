@@ -8,7 +8,7 @@ var credit_list = [
         "<br>Cheng Yu Tung Building:<br>" +
         "The place where you pass through when you go to South Gate",
         name: "Modeled by Chit",
-        link: "#"
+        link: "contact.html"
     },
     {
         title: "Map: Academic Concourse (upper), LG5",
@@ -88,19 +88,57 @@ function shuffle(array) {
 shuffle(credit_list)
 
 let credit_html = ""
-credit_list.forEach( credit => {
-    let html_list = []
-    html_list.push("<div class=\"credit\"><h2>")
-    html_list.push(credit.title)
-    html_list.push("</h2><p>")
-    html_list.push(credit.description)
-    html_list.push("</p><a href=\"")
-    html_list.push(credit.link)
-    html_list.push("\" target=\"_blank\" ><h3>")
-    html_list.push(credit.name)
-    html_list.push("</h3></a></div>")
-    credit_html += html_list.join("")
-})
 
+if (screen.availWidth < 1000) {
+    console.log("smaller than 1000")
+    credit_list.forEach(credit => {
+        let html_list = []
+        html_list.push("<div class=\"credit\"><h2>")
+        html_list.push(credit.title)
+        html_list.push("</h2><p>")
+        html_list.push(credit.description)
+        html_list.push("</p><a href=\"")
+        html_list.push(credit.link)
+        html_list.push("\" target=\"_blank\" ><h3>")
+        html_list.push(credit.name)
+        html_list.push("</h3></a></div>")
+        credit_html += html_list.join("")
+    })
+} else {
+    console.log("bigger than 1000")
+    credit_html += "<table>"
+    var line_counter = 0
+    credit_list.forEach(credit => {
+        // console.log(credit.title)
+        if (line_counter++ == 0) {
+            credit_html += "<tr>"
+        }
+        credit_html += "<td>"
+        let html_list = []
+        html_list.push("<div class=\"credit\"><h2>")
+        html_list.push(credit.title)
+        html_list.push("</h2><p>")
+        html_list.push(credit.description)
+        html_list.push("</p><a href=\"")
+        html_list.push(credit.link)
+        html_list.push("\" target=\"_blank\" ><h3>")
+        html_list.push(credit.name)
+        html_list.push("</h3></a></div>")
+        credit_html += html_list.join("")
+        credit_html += "</td>"
+        if (line_counter == 2) {
+            line_counter = 0
+            credit_html += "</tr>"
+        }
+        console.log(credit_html)
+    })
+    if (credit_html.endsWith("</td>")) {
+        credit_html += "</tr>"
+    }
+    credit_html += "</table>"
+
+}
+
+console.log(credit_html)
 
 document.getElementById("credits").innerHTML= credit_html
