@@ -1,5 +1,10 @@
 import sceneEvents from "./eventcenter.js";
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 export default class GameUI extends Phaser.Scene {
     constructor() {
         super("game-ui");
@@ -7,28 +12,19 @@ export default class GameUI extends Phaser.Scene {
 
     create() {
 
+        // Create a text container
         this.textContainer = this.add.container(screen.gameWidth * 0.5, screen.gameHeight * 0.8)
-
+        // Add a text box, and set its attributes
         this.textBox = this.add.image(0, 0, "textbox").setInteractive()
         this.textBox.setDepth(1)
         this.textBox.setDisplaySize(screen.gameWidth * 0.8, screen.gameHeight * 0.15)
         this.textBox.setAlpha(0.7)
-
+        // Set variables related to text box
         var temp1 = this.textBox.getTopLeft()
-
         this.charPerLine = screen.gameWidth * 0.7 * 0.118
-
         this.textMessage = this.add.text(temp1.x + 5, temp1.y + 5, "", { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif' })
-
-
-        // var rawTextMessage = "BitmapText objects are less flexible than Text objects, in that they have less features such as shadows, fills and the ability to use Web Fonts, however you trade this flexibility for rendering speed. You can also create visually compelling BitmapTexts by processing the font texture in an image editor, applying fills and any other effects required."
-        //
-        // var arrayOfLines = fold(rawTextMessage, charPerLine);
-        // var foldedString = arrayOfLines.join('\n');
-
-
+        // Includes the things in the text container, the set it to invisible
         this.textContainer.visible = false
-
         this.textContainer.add(this.textBox)
         this.textContainer.add(this.textMessage)
 
@@ -36,7 +32,26 @@ export default class GameUI extends Phaser.Scene {
             this.updateChat()
         })
 
+        // Set up the map indicator
+        this.mapIndicator = this.add.text(20, 20, "adfasdfadsf")
+        this.mapIndicator.setAlpha(0)
+
         sceneEvents.on("startDialog", this.startMonolog, this)
+        sceneEvents.on("changeMap", this.indicateMap, this)
+    }
+
+    async indicateMap (mapName) {
+        this.mapIndicator.text = "Now loading " + mapName
+        for(var i = 0; i < 99; i ++) {
+            await sleep(20)
+            this.mapIndicator.setAlpha(i/100)
+        }
+        for(var i = 99; i > 1; i--) {
+            await sleep(20)
+            await this.mapIndicator.setAlpha(i/100)
+        }
+        await this.mapIndicator.setAlpha(0)
+
     }
 
     test () {

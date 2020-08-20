@@ -5,6 +5,11 @@
     <title>USTown.live</title>
     <link rel="stylesheet" href="css/horizontal_menu.css">
     <link rel="stylesheet" href="css/main.css">
+    <script>
+        if (location.host == "ustown.live" && location.protocol !== 'https:') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
 </head>
 <body>
 <div id="icon">
@@ -19,13 +24,13 @@
         <li><a href="contact.html">Contact</a></li>
     </ul>
 </div>
-<div id="blog">
-<div id="post">
-    <h1>Blog Title</h1>
-    <h2>yyyy-mm-dd</h2>
-    <p>Blog content</p>
+<div class="beforeLoad">
+    <h1>The game is currently under maintenance</h1>
+    <p>Please come back another time when the game is back</p>
+    <br>
+    <h2>About USTown.live</h2>
+    <p>This game aims to help you better understand the environment of HKUST</p>
 </div>
-</div>
-<script src="webjs/blog.js"></script>
+
 </body>
 </html>

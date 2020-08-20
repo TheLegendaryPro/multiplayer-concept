@@ -60,6 +60,7 @@ export default class Client {
         this.socket.on('j', (data) => {
             console.log('player join', data)
             this.scene.addNewPlayer(data.playerID, data.x, data.y, data.skin)
+            this.scene.playSound('playerJoin')
         })
 
         // The function to know what is my id from the server

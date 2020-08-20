@@ -1,65 +1,85 @@
-import express from 'express'
+import fs from 'fs'
+import http from 'http'
+import https from 'https'
+try {
+    var privateKey = fs.readFileSync('/etc/letsencrypt/live/ustown.live/privkey.pem', 'utf-8')
+    var certificate = fs.readFileSync('/etc/letsencrypt/live/ustown.live/fullchain.pem', 'utf-8')
+    var useHttps = true
+} catch (error) {
+    var useHttps = false
+    console.log("No https, only starting server on http")
+}
 
+
+import express from 'express'
 // Use express to send files
 let app = express();
-// todo Failed to set up https, have to find a way
-import fs from 'fs'
+app.use(express.static('maintenance'))
 
-app.key = fs.readFileSync('key.pem');
-app.cert = fs.readFileSync('cert.pem')
+// Start both http server and https server
+var httpServer = http.Server(app)
+if (useHttps) {
+    var credentials = {key: privateKey, cert: certificate};
+    var httpsServer = https.Server(credentials, app)
+}
 
-// For now I am using normal http server
-// var server = require('http').Server(app);
-import http from 'http'
-var server = http.Server(app);
-// console.log(server)
-// Socket.io for client server communications
-// let io = require('socket.io').listen(server);
+// Import socket but not use it yet
 import socket from 'socket.io'
-let io = socket.listen(server)
+// Create a new socket
+var io = new socket
+
+// Http and https both listen to different port
+httpServer.listen(process.env.PORT || 80, () => {
+    console.log('Listening on ' +httpServer.address().port);
+})
+io.attach(httpServer)
+
+if (useHttps) {
+    httpsServer.listen(process.env.PORT || 443, () => {
+        console.log('Listening on ' + httpsServer.address().port);
+    })
+    io.attach(httpsServer)
+}
+
+
+import winston from 'winston'
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' }),
+    ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}
+
 
 
 
 import Codec from "./public/js/codec.js";
 
-// for app.use, to send html and other files
-// var options = {
-//     dotfiles: 'ignore',
-//     etag: false,
-//     maxAge: '1d',
-//     redirect: false,
-//     extensions: ['html'],
-//     index: false,
-//     setHeaders: function (res, path, stat) {
-//         res.set('x-timestamp', Date.now())
-//     }
-// }
-// like: app.use('/assets',express.static(__dirname + '/assets'));
-
-// So that they can access public files
-app.use(express.static('public'))
-
-
-// app.get('/', (req, res) => {
-//     res.sendFile(__dirname + '/public/index.html');
-// });
-
-// Listen to a port
-server.listen(process.env.PORT || 80, () => {
-    console.log('Listening on ' +server.address().port);
-})
-
-
-
 // A object to store locations of players
 app.lastPlayerLocation = {
     // Contains id: {x:x, y:y}
 }
+app.connectCounter = 0
 
 
 // The event handler for socket.io
 io.on('connection', function (socket) {
     // Whenever newplayer is recieved
+    app.connectCounter++
     socket.on('n', async function (skin) {
         var usedIDs = []
         Object.keys(io.sockets.connected).forEach( socketID => {
@@ -112,6 +132,16 @@ io.on('connection', function (socket) {
 
         // Ask all client to delete the player when he disconnects
         socket.on('disconnect',function(){
+            app.connectCounter--
+            var currentdate = new Date()
+            var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+            // console.log(datetime + ' - Disconnection, IP: ' + socket.handshake.address + ' Duration: ' + msToTime((currentdate - new Date(socket.handshake.time))))
+            logger.log('info', datetime + ' - Disconnection, IP: ' + socket.handshake.address + ' Duration: ' + msToTime((currentdate - new Date(socket.handshake.time))) + ' Player count: ' + app.connectCounter)
             io.emit('r',socket.player.playerID);
         });
 
@@ -149,7 +179,15 @@ io.on('connection', function (socket) {
 
     // Just a test function when test is recieved
     socket.on('test', function (content, ark) {
-        console.log('We received a test indicating a new connection from a client')
+        var currentdate = new Date()
+        var datetime = currentdate.getDate() + "/"
+            + (currentdate.getMonth()+1)  + "/"
+            + currentdate.getFullYear() + " @ "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
+        // console.log(datetime + ' - New connection, IP: ' + socket.handshake.address + ', Type: ' + socket.handshake.headers["user-agent"])
+        logger.log('info', datetime + ' - New connection, IP: ' + socket.handshake.address + ', Type: ' + socket.handshake.headers["user-agent"])
         ark('The test was well received')
     })
 
@@ -208,37 +246,6 @@ io.on('connection', function (socket) {
             }
         })
 
-
-
-        // // A complicated function I have no idea how it works, loop through all connected sockets?
-        // Object.keys(io.sockets.connected).forEach(function (socketID) {
-        //     // Set player to the socket player object
-        //     var player = io.sockets.connected[socketID].player
-        //     // If the player exits, add it to the list
-        //     // console.log('test')
-        //
-        //     // console.log(app.lastPlayerLocation)
-        //     // console.log(player)
-        //     if (player != undefined && (app.lastPlayerLocation[player.playerID].x != player.x || app.lastPlayerLocation[player.playerID].y != player.y)) {
-        //         // console.log('results')
-        //         app.lastPlayerLocation[player.playerID].x = player.x
-        //         app.lastPlayerLocation[player.playerID].y = player.y
-        //         players.push(player)
-        //     }
-        //     // if (player != selfPlayer)
-        // })
-        //
-        // // Send it to the clients only when it is necessory
-        // // todo make this always send, since when real launch every sec will have players
-        // if (players.length) {
-        //     // socket.volatile.emit('otherlocation', players);
-        //     // console.log(players)
-        //     var buffer = Codec.encodePlayerChunk(players)
-        //     // console.log(buffer)
-        //     io.to('main').volatile.emit('o', buffer);
-        //     // console.log("otherlocation")
-        // }
-        // console.log('otherlocation', players)
     }, 300); //todo
 
 })
@@ -254,22 +261,6 @@ function getAllPlayers(socket) {
     Object.keys(socket.rooms).forEach( key => {
         value = socket.rooms[key]
     })
-
-    // DELETED: useless code to make sure that the client is only in one room
-    // Object.keys(io.sockets.adapter.rooms).forEach(function (roomName) {
-    //     // Loop through the room for the PLAYER socket
-    //     Object.keys(socket.rooms).forEach( key => {
-    //         value = socket.rooms[key]
-    //     })
-    //     // If the room of io and player matches
-    //     if (roomName == value) {
-    //         console.log('the correct room is', value, io.sockets.adapter.rooms[roomName])
-    //         // Object.keys(io.sockets.adapter.rooms[roomName].sockets).forEach(key => {
-    //         //     console.log('ppl', key)
-    //         // })
-    //     }
-    //     // console.log('iosocketsconnected', io.sockets.connected[value])
-    // })
 
     // Find all sockets to see what players are inside that room
     Object.keys(io.sockets.connected).forEach(function (socketID) {
@@ -289,15 +280,24 @@ function getAllPlayers(socket) {
 }
 
 
-// var roomAreas = [
-//     ["atriumSample1"],
-//     ["dungeon"]
-// ]
+function msToTime(duration) {
+    var milliseconds = parseInt((duration % 1000) / 100),
+        seconds = Math.floor((duration / 1000) % 60),
+        minutes = Math.floor((duration / (1000 * 60)) % 60),
+        hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds;
+}
+
 
 
 var roomAreas = [
     ["LG5", "frogRoad", "atrium", "AC1", "fireChick"],
-    ["dungeon_sheet", "dungeon", "CYT1", "SG"]
+    ["dungeon_sheet", "dungeon", "CYT1", "SG", "AC2", "busiSchool"]
 ]
 
 

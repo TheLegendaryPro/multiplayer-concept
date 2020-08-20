@@ -25,6 +25,10 @@ export default class Atrium extends Phaser.Scene {
     {
         this.scene.run('game-ui')
 
+        this.input.keyboard.on('keydown-T', function () {
+            this.Tfunction()
+        }, this);
+
         this.input.on("pointerdown", pointer => {
             var deltaX = pointer.downX - window.innerWidth * 0.3
             var deltaY = pointer.downY - window.innerHeight * 0.3
@@ -48,6 +52,10 @@ export default class Atrium extends Phaser.Scene {
         this.input.on("pointerout", pointer => {
             this.mobileInput = "stop"
         })
+
+        this.sound.volume = 0.05
+        this.addAllAudios()
+
 
         // ## PLAYER ##
         // The sprite
@@ -82,6 +90,7 @@ export default class Atrium extends Phaser.Scene {
         this.fauna.setDepth(1)
 
         this.readyToTeleport = true
+
 
 
         // var convo = this.physics.add.sprite(610, 1230, "npctalk").setDepth(1).setImmovable()
@@ -119,6 +128,8 @@ export default class Atrium extends Phaser.Scene {
 
         // remarks: I removed the ? after left, right, up and down, cause I couldn't obfuscate with them
         if (this.cursors.left.isDown || this.mobileInput == "left") {
+            // this.loadMap('busiSchool', 'busiSchoolTiles')
+            // console.log(this.fauna.x, this.fauna.y)
             parts[1] = "run"
             parts[2] = "side"
             this.fauna.setVelocity(-speed, 0)
@@ -147,6 +158,20 @@ export default class Atrium extends Phaser.Scene {
 
     }
 
+    Tfunction () {
+        console.log(this.fauna.x, this.fauna.y)
+    }
+
+    addAllAudios () {
+        this.audios = {
+            'enterPortal': this.sound.add('enterPortal'),
+            'playerJoin': this.sound.add('playerJoin')
+        }
+    }
+
+    playSound (name) {
+        this.audios[name].play()
+    }
 
     setSkin (skinName) {
         this.skin = skinName
@@ -177,9 +202,11 @@ export default class Atrium extends Phaser.Scene {
         this.addAllPortals(this.portalJSON, mapName)
         this.addAllDialogChars(this.dialogJSON, mapName)
         // Return the map object to be set at as this.currentMap
+        this.playSound('enterPortal')
+        sceneEvents.emit("changeMap", mapName)
         setTimeout( () => {
             this.readyToTeleport = true
-        }, 5000)
+        }, 3000)
         return map
     }
 
@@ -215,6 +242,8 @@ export default class Atrium extends Phaser.Scene {
         var dialog = this.physics.add.sprite(x + 10, y - 10, "npctalk").setDepth(1)
         dialog.setFrame(type + ".png")
         var dialogChar = this.physics.add.sprite(x, y, character).setDepth(1).setImmovable()
+        var longerSide = (dialogChar.displayHeight > dialogChar.displayWidth) ? dialogChar.displayHeight : dialogChar.displayWidth
+        dialogChar.setScale(25/longerSide)
 
         // var dialogCollider = this.physics.add.collider(this.fauna, dialog)
         var charCollider = this.physics.add.collider(this.fauna, dialogChar, this.hitDialogChar, null, this)
@@ -351,8 +380,13 @@ export default class Atrium extends Phaser.Scene {
             player.anims.play(parts.join("-"), true)
         }
 
+        var numPlayerTime = 0
+        for (var i = 0, inc = 50; i < Object.keys(this.playerMap).length; i++, inc--) {
+            numPlayerTime += inc
+            if (numPlayerTime < 0) break
+        }
 
-        var tweenDelay = screen.client.delay + Object.keys(this.playerMap).length * 20
+        var tweenDelay = screen.client.delay + numPlayerTime
         // console.log(tweenDelay)
 
         // Set up the config for tween
@@ -524,6 +558,26 @@ export default class Atrium extends Phaser.Scene {
                     "vert": false,
                     "tpX": 310,
                     "tpY": 190
+                },
+                {
+                    "x": 2700,
+                    "y": 20,
+                    "map": "bridgeLink",
+                    "tileset": "bridgeLinkTiles",
+                    "vert": false,
+                    "tpX": 300,
+                    "tpY": 2320
+                }
+            ],
+            "bridgeLink": [
+                {
+                    "x": 300,
+                    "y": 2360,
+                    "map": "LG5",
+                    "tileset": "LG5Tiles",
+                    "vert": false,
+                    "tpX": 2700,
+                    "tpY": 50
                 }
             ],
             "AC1": [
@@ -595,6 +649,26 @@ export default class Atrium extends Phaser.Scene {
                     "vert": true,
                     "tpX": 1415,
                     "tpY": 125
+                },
+                {
+                    "x": 2865,
+                    "y": 74,
+                    "map": "busiSchool",
+                    "tileset": "busiSchoolTiles",
+                    "vert": true,
+                    "tpX": 95,
+                    "tpY": 3680
+                }
+            ],
+            "busiSchool": [
+                {
+                    "x": 65,
+                    "y": 3700,
+                    "map": "SG",
+                    "tileset": "SGTiles",
+                    "vert": true,
+                    "tpX": 2770,
+                    "tpY": 125
                 }
             ]
         }
@@ -615,16 +689,69 @@ export default class Atrium extends Phaser.Scene {
 
     returnDialogJOSN () {
         return {
+            "frogRoad": [
+                {
+                    "type": "talk3",
+                    "character": "Shirogane",
+                    "x":400,
+                    "y":790,
+                    "content": ['Hi there, welcome to USTown.live (Click here to continue)', 'You can move by clicking on the screen or pressing arrow keys', 'You can walk into purple things and they will take you to another place', 'Have fun!']
+                }
+            ],
+            "fireChick": [
+                {
+                    "type": "talk3",
+                    "character": "Kazuma",
+                    "x": 1600,
+                    "y": 1300,
+                    "content": ['Hello there, new adventurer', 'What takes you here?', 'Anyways, hope you have an amazing journey']
+                }
+            ],
             "atrium": [
                 {
                     "type": "talk3",
-                    "character": "pupa",
-                    "x": 800,
-                    "y": 1250,
-                    "content": ["Hi there (press or click on here to continue)", "Welcome to HKUST", "feel free to explore around here"]
+                    "character": "Ishigami",
+                    "x": 570,
+                    "y": 80,
+                    "content": ['Why am I standing here?', 'Because the view here is nice, that\'s it']
+                }
+            ],
+            "LG5": [
+                {
+                    "type": "talk3",
+                    "character": "Kaguya",
+                    "x": 1360,
+                    "y": 140,
+                    "content": ['This is where the student union is located', 'Want me to bring you a cup of tea?']
+                }
+            ],
+            "bridgeLink": [
+                {
+                    "type": "talk3",
+                    "character": "ZeroTwo",
+                    "x": 345,
+                    "y": 1230,
+                    "content": ['Legend has it that who ever jumps over this stone on my left will get a GPA of 4 or above', 'Wanna try and prove that you are not a weakling?']
+                }
+            ],
+            "AC1": [
+                {
+                    "type": "talk3",
+                    "character": "Megumin",
+                    "x": 930,
+                    "y": 100,
+                    "content": ['This is the school of science', 'Do you know where the school of magic is?']
+                }
+            ],
+            "AC2": [
+                {
+                    "type": "talk3",
+                    "character": "Chika",
+                    "x": 585,
+                    "y": 735,
+                    "content": ['Do you know what different vending machines have different prices?', 'Now buy me a drink', 'I\'ll give you a cola for it']
                 }
             ]
-
         }
     }
 }

@@ -40,6 +40,12 @@ export default class Main extends Phaser.Scene {
         this.load.image('AC2Tiles', 'assets/images/AC2_extruded.png')
         this.load.tilemapTiledJSON('AC2', 'assets/AC2map.json')
 
+        this.load.image('busiSchoolTiles', 'assets/images/busiSchool_extruded.png')
+        this.load.tilemapTiledJSON('busiSchool', 'assets/busiSchoolmap.json')
+
+        this.load.image('bridgeLinkTiles', 'assets/images/bridgeLink_extruded.png')
+        this.load.tilemapTiledJSON('bridgeLink', 'assets/bridgeLinkmap.json')
+
         // ## PLAYERS ##
         // The main player
         this.load.atlas('fauna', 'assets/images/fauna.png', 'assets/fauna.json')
@@ -47,14 +53,24 @@ export default class Main extends Phaser.Scene {
         this.load.atlas('boy', 'assets/images/boy.png', 'assets/boy.json')
 
         // ## NPCS ##
-        this.load.atlas('pupa', 'assets/images/pupaA.png', 'assets/pupaA.json')
         this.load.atlas('npctalk', 'assets/images/npctalk.png', 'assets/npctalk.json')
+
+        this.load.image('Kaguya', 'assets/images/Kaguya.png')
+        this.load.image('Chika', 'assets/images/Chika.png')
+        this.load.image('ZeroTwo', 'assets/images/ZeroTwo.png')
+        this.load.image('Ishigami', 'assets/images/Ishigami.png')
+        this.load.image('Kazuma', 'assets/images/Kazuma.png')
+        this.load.image('Megumin', 'assets/images/Megumin.png')
+        this.load.image('Shirogane', 'assets/images/Shirogane.png')
 
         // ## OBJECTS ##
         this.load.image('portalVert', '/assets/images/portalVert.png')
         this.load.image('portalHorz', '/assets/images/portalHorz.png')
 
         this.load.image("textbox", "assets/images/textbox.png")
+
+        this.load.audio('enterPortal', [ '/assets/audios/enterPortal.ogg', '/assets/audios/enterPortal.mp3'])
+        this.load.audio('playerJoin', [ '/assets/audios/playerJoin.ogg', '/assets/audios/playerJoin.mp3'])
 
 
     };
