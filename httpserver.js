@@ -1,45 +1,22 @@
 // Import the module to read file and to open http and https server
-import fs from 'fs'
 import http from 'http'
-import https from 'https'
-// Read the certificates
-try {
-    var privateKey = fs.readFileSync('/etc/letsencrypt/live/ustown.live/privkey.pem', 'utf-8')
-    var certificate = fs.readFileSync('/etc/letsencrypt/live/ustown.live/fullchain.pem', 'utf-8')
-    var useHttps = true
-} catch (error) {
-    var useHttps = false
-    console.log("No https, only starting server on http")
-}
 // Use express to send files, start an app
 import express from 'express'
 let app = express();
 // Send clients all files within public
 app.use(express.static('public'))
-
-// Start both http server and https server
+// Start http server
 var httpServer = http.Server(app)
-if (useHttps) {
-    var credentials = {key: privateKey, cert: certificate};
-    var httpsServer = https.Server(credentials, app)
-}
 
 // Import socket but not use it yet, then create a new socket
 import socket from 'socket.io'
 var io = new socket
 
 // Http and https both listen to different port
-httpServer.listen(process.env.PORT || 80, () => {
+httpServer.listen(process.env.PORT || 10003, () => {
     console.log('Listening on ' +httpServer.address().port);
 })
 io.attach(httpServer)
-
-if (useHttps) {
-    httpsServer.listen(process.env.PORT || 443, () => {
-        console.log('Listening on ' + httpsServer.address().port);
-    })
-    io.attach(httpsServer)
-}
 
 // Use winston for logging
 import winston from 'winston'
