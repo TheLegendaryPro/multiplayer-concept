@@ -4,5 +4,8 @@ services:
     ports:
       - "10003:3000"
     volumes:
-      - ustown_data:/app/logs
+      - ustown-data:/app/logs
     restart: unless-stopped
+
+volumes:
+  ustown-data:
